@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <script src="src/code-block.js"></script>
+    <script src="main.js"></script>
+    <title>Staquia</title>
+</head>
+
+<body>
+    <header>
+    </header>
+    <main>
+        <section class="sign">
+            <h1>
+                Staquia
+                <img src="./images/Sorted Tables.png">
+            </h1>
+            <span>A configurable <b>position</b> based algorithm</span>
+        </section>
+        <article>
+            <h2>Introduction</h2>
+            <p>
+                This algorithm makes use of the languages <b>string comparison</b> systems.<br>
+                When two string are compared internally what is checked is the
+                <a href="https://en.wikipedia.org/wiki/Unicode">unicode standard</a> value that represents the caracter.
+            </p>
+            <div id="introduction-code-block" class="code-block">
+                <script>
+                    {
+                        var container = document.getElementById("introduction-code-block");
+                        edeclaration({ comment: 'The string "a" has the unicode value \u0061', name: "a", values: ["a"] });
+                        edeclaration({ comment: 'The string "z" has the unicode value \u007A', name: "z", values: ["z"] });
+                        ecomment("Prints `true` as in hexadecimal 61 < 7A");
+                        elog(elet("a"), " < ", elet("z"));
+                    }
+                </script>
+            </div>
+            <p>
+                Uses a <b>position</b> based on the mentioned string system thus is divided in the 2 segments called <code>n</code> and <code>z</code>.
+            </p>
+            <h3>Segment <code>n</code></h3>
+            <p class="sub">
+                The purpose for this segment is to move <b>up</b> or <b>down</b> in a string.<br>
+                In the following example is shown how to get the next character from another based on unicode values.
+            </p>
+            <div id="position-code-block-n" class="code-block">
+                <script>
+                    {
+                        var container = document.getElementById("position-code-block-n");
+                        edeclaration({ comment: 'This stores the number that represents the `a` value', name: "a", values: [
+                            "a", eplain("."), efunction("charCodeAt", 0)
+                        ]});
+                        edeclaration({ comment: 'Just add 1 and return back as string', name: "b", values: [
+                            eclass("String"), edot(), efunction("fromCharCode", econcat(null, [elet("a"),1], " + ")),
+                        ]});
+                        ecomment("Prints `b` as is the following unicode character from `a`");
+                        elog(elet("b"));
+                    }
+                </script>
+            </div>
+            <h3>Segment <code>z</code></h3>
+            <p class="sub">
+                The purpose for this segment is to get the <b>core</b> or <b>middle</b> value from two strings.<br>
+                In the following example is shown how to get the mid character from another two, based on unicode values.                
+            </p>
+            <div id="position-code-block-z" class="code-block">
+                <script>
+                    {
+                        var container = document.getElementById("position-code-block-z");
+                        edeclaration({ comment: 'This stores the number that represents the `a` value (97)', name: "a", values: [
+                            "a", edot(), efunction("charCodeAt", 0)
+                        ]});
+                        edeclaration({ comment: 'This stores the number that represents the `z` value (122)', name: "z", values: [
+                            "z", edot(), efunction("charCodeAt", 0)
+                        ]});
+                        edeclaration({ comment: 'Just add 1 and return back as string', name: "n", values: [
+                            eclass("String"), edot(), efunction("fromCharCode", econcat(null, [
+                                esurround([ elet("a"), elet("z") ],"(",")", " + "), eplain(" / "), 2
+                            ])),
+                        ]});
+                        ecomment("Prints `n` as is the average value between `a` and `z`");
+                        elog(elet("n"));
+                    }
+                </script>
+            </div>
+            <p>
+                A deeper detail from these two segments will be mentioned later when other important topics are covered.
+            </p>
+        </article>
+        <article>
+            <h2>Number System</h2>
+            <p>
+                To achieve the goal to get use of the comparison system, a <b>number system</b> is needs to be created with the following axioms:
+            </p>
+            <ul>
+                <li><span style="color: rgb(180, 0, 0);">No</span> negative number exists</li>
+                <li>The set contains at least <span style="color:#8a9c81;">3</span> elements</li>
+                <li>Exits a final number <code>sf</code></li>
+                <li>Exits a start number <code>s0</code></li>
+                <li>Exits a zero number <code>z</code></li>
+                <li>Exits a middle character <code>m</code> that is the value between <code>sf</code> and
+                    <code>s0</code> such that <code>m = ceil((sf + s0) / 2)</code></li>
+            </ul>
+            <p>
+                In the following example it is shown how to set a system using the 26 basic letters from the english alphabet [ a - z ]
+                plus the exclamation mark [ ! ] as the zero.  
+            </p>
+            <div id="number-system-code-block" class="code-block">
+                <span class="comment">As long as "zero &#60; first &#60; last" any values can be used</span>
+                <script>
+                    {
+                        var container = document.getElementById("number-system-code-block");
+                        eclass("Staquia"); edot(); efunction("update", esurround([
+                            econcat(null, [elet("zero"), eplain(":"), "!"]),
+                            econcat(null, [elet("first"), eplain(":"), "a"]),
+                            econcat(null, [elet("last"), eplain(":"), "b"]),
+                        ], "{ ", " }", ", "));
+                        eplain(";");
+                    }
+                </script>
+            </div>
+            <div class="note">
+                <span class="start">Note:&nbsp;</span>
+                <span>For simplicity, during all examples this is the system that will be used.</span>
+                <span>In a real scenarios it can be used a wider range.</span>
+            </div>
+        </article>
+    </main>
+    <footer></footer>
+</body>
+
+</html>
