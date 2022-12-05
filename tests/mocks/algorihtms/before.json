@@ -1,0 +1,1 @@
+{"skip":false,"items":[{"_id":"638a5b5e7bcb8afa29c86edf","skip":false,"value":"z","expected":"y","message":"Should go one value before (638a5b5e7bcb8afa29c86edf)"},{"_id":"638a5b5e7bcb8afa29c86ee0","skip":false,"value":"z!","expected":"yz","message":"Should go (base * n - 1) place before when starts with 'zero' (638a5b5e7bcb8afa29c86ee0)"}]}
