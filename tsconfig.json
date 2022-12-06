@@ -21,7 +21,10 @@
   ],
   "ts-node": {
     "compilerOptions": {
-      "module": "Node16",
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "target": "ES2022",
+      "module": "CommonJS",
     },
     "files": true
   }
