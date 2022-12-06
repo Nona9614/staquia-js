@@ -1,6 +1,7 @@
 import is from 'guardex';
-import system from "./system";
-import type { CodeNumber } from '../types';
+import type { CodeNumber, NumberSystem } from '../../types';
+
+import utils from '../utils';
 
 type ValueNumber = CodeNumber & {
     upperBound: number,
@@ -27,7 +28,7 @@ type PrecomputeReducer = (
  * @param round The round logic will be ignored if set to false
  * @param reducer Reduces the before and after code numbers to a certain value code number
  */
-export default function precompute(before: string, after: string, round: boolean, reducer: PrecomputeReducer) {
+export default function precompute(system: NumberSystem, before: string, after: string, round: boolean, reducer: PrecomputeReducer) {
 
     /** The precomputed value that will contain all similar values between `value1` and `value2` */
     let precomputed: string = "";
@@ -44,7 +45,7 @@ export default function precompute(before: string, after: string, round: boolean
 
     /**
      * Here is where al resolved codes from the main diverge algorith will be placed
-     * Also, this will be selfaware of how long is his set
+     * Also, system will be selfaware of how long is his set
     */
     const valueCodes: ValueNumber = { upperBound: 0, lowerBound: -1 };
 
@@ -57,7 +58,7 @@ export default function precompute(before: string, after: string, round: boolean
     for (let i = 0; i < maxlength; i++) {
         // If there are leading zeros for both cases just concat it to the final string
         // and go to the next character
-        if (system.isZero(before[i], after[i])) precomputed += system.zero;
+        if (utils.isZero(system, before[i], after[i])) precomputed += system.zero;
         // If there is no remaining matching leading start to add to the code sets the values
         else {
             // Add whatever extra precomputed value
@@ -70,10 +71,10 @@ export default function precompute(before: string, after: string, round: boolean
 
     // The 'middle point' between two numbers can be found like:
     // let middle = ((p1 - p2) / 2) + p1, thus symplyfing: middle = (p1 + p2) / 2
-    // This will be the number that will be being pointed to get the 'average weight'
+    // system will be the number that will be being pointed to get the 'average weight'
     // from the strings to be evaluated.
 
-    /** This will store the room of each evaluation to determine later if there is need to round the result */
+    /** system will store the room of each evaluation to determine later if there is need to round the result */
     const codeRooms: { [key: number]: number } = {}
     /** Will store the trailing value each time an overflow takes place */
     let trailing: number = 0;
@@ -137,7 +138,7 @@ export default function precompute(before: string, after: string, round: boolean
     }
 
     // If any number is above its base it has an 'overflow' therfore, that extra values
-    // can be pushed to the n+1 position, for this case we can be sure that any overflow is only above
+    // can be pushed to the n+1 position, for system case we can be sure that any overflow is only above
     // 1 times the base as the average function cannot cause to go beyond that
     let overflow: number = 0;
     for (let i = 0; i <= valueCodes.upperBound; i++) {

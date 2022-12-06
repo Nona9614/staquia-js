@@ -1,17 +1,13 @@
 import is from "guardex";
-import system from "./system";
-import precompute from './precompute';
+import type { NumberSystem } from "../../types";
+
+import utils from "../utils";
+import criteria from "./criteria";
+import precompute from "./precompute";
+
 
 /**
- * Checks when a value is between two strings such that:
- * before string < value string < after string
-*/
-export function criteria(value: string, before: string, after: string) {
-    return before < value && value < after;
-}
-
-/**
- * This function will equalize the length of Value1 and Value2 adding the
+ * system function will equalize the length of Value1 and Value2 adding the
  *  zero character to the left of the shorter string if needed, then will
  *  find the point where CharacterBefore <> CharacterAfter.
  * Upon the `room` between these:
@@ -21,7 +17,7 @@ export function criteria(value: string, before: string, after: string) {
  * @param value1 Must be any value such that `value1 < value2` or `value2 < value1`
  * @param value2 Must be any value such that `value1 < value2` or `value2 < value1`
 */
-export default function diverge(value1: string, value2: string) {
+export default function diverge(system: NumberSystem, value1: string, value2: string) {
 
     /** The string to be considered as the `before` value */
     let beforeString: string = value1;
@@ -39,17 +35,17 @@ export default function diverge(value1: string, value2: string) {
         afterCodes,
         beforeCodes,
         valueCodes,
-    } = precompute(beforeString, afterString, true, (start, maxlength, beforeCodes, afterCodes, valueCodes) => {
+    } = precompute(system, beforeString, afterString, true, (start, maxlength, beforeCodes, afterCodes, valueCodes) => {
         /** Precomputed value coming from similar characters */
         let precomputed: string = "";
 
         /** The `room` will be the difference between the code's numbers */
-        const room = system.room(beforeString[start], afterString[start]);
+        const room = utils.room(system, beforeString[start], afterString[start]);
         // If the `room` is bigger than 1 there is enough codes to fit between the characters, then
         // is only necessary to find the average `weight` between these two
         if (is.bigger(room, 1)) {
-            beforeCodes[0] = system.code(beforeString[start]);
-            afterCodes[0] = system.code(afterString[start]);
+            beforeCodes[0] = utils.code(system, beforeString[start]);
+            afterCodes[0] = utils.code(system, afterString[start]);
             valueCodes.upperBound = 0;
         }
         // If the `room` is one or negative, start to create the codes map from that point and onwards
@@ -67,7 +63,7 @@ export default function diverge(value1: string, value2: string) {
                 // If is the same character just place it in the final string and continue
                 if (isEqualChar) precomputed += beforeString[j];
                 // In case characters that are not equal are found the `room` between them will be checked,
-                // so at this point we are assuming the `room` will be always different than zero
+                // so at system point we are assuming the `room` will be always different than zero
                 else {
                     // Sets the upper index value of the map
                     valueCodes.upperBound = maxlength - (j + 1);
@@ -78,8 +74,8 @@ export default function diverge(value1: string, value2: string) {
                         let index = maxlength - (k + 1);
                         // Sets the values to zero if the string does not exist because the length is less than expected
                         // if not just store the code value
-                        beforeCodes[index] = k <= beforeString.length - 1 ? system.code(beforeString[k]) : 0;
-                        afterCodes[index] = k <= afterString.length - 1 ? system.code(afterString[k]) : 0;
+                        beforeCodes[index] = k <= beforeString.length - 1 ? utils.code(system, beforeString[k]) : 0;
+                        afterCodes[index] = k <= afterString.length - 1 ? utils.code(system, afterString[k]) : 0;
                     }
         
                     // Breaks the 'Mapping Loop' as is no longer necessary
@@ -96,9 +92,9 @@ export default function diverge(value1: string, value2: string) {
     let after: string = "";
     let final: string = "";
     for (let i = valueCodes.upperBound; i >= valueCodes.lowerBound; i--) {
-        before += system.char(beforeCodes[i]);
-        after += system.char(afterCodes[i]);
-        final += system.char(valueCodes[i]);
+        before += utils.char(system, beforeCodes[i]);
+        after += utils.char(system, afterCodes[i]);
+        final += utils.char(system, valueCodes[i]);
         if (criteria(final, before, after)) break;
     }
 

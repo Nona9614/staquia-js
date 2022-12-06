@@ -1,4 +1,6 @@
-import system from "./system";
+import type { NumberSystem } from "../../types";
+
+import utils from "../utils";
 import precompute from "./precompute";
 
 /**
@@ -13,11 +15,11 @@ import precompute from "./precompute";
  * @remarks When q mod 2 is different from 0 then the mid character
  * from the set of the nth base, should be placed at the end of the output.
  */
-export default function between(before: string, after: string, round: boolean = true) {
+export default function between(system: NumberSystem, before: string, after: string, round: boolean = true) {
     const {
         valueCodes,
         precomputed
-    } = precompute(before, after, round, (start, maxlength, beforeCodes, afterCodes, valueCodes) => {
+    } = precompute(system, before, after, round, (start, maxlength, beforeCodes, afterCodes, valueCodes) => {
         valueCodes.upperBound = maxlength - 1 - start;
 
         const beforeLengthDelta = maxlength - before.length;
@@ -25,17 +27,17 @@ export default function between(before: string, after: string, round: boolean = 
         for (let k = maxlength - 1; k >= start; k--) {
             // Reorder the numbers to be placed the opposite way
             const index = maxlength - 1 - k;
-            // If the difference is negative means that this number is just a leading zero
+            // If the difference is negative means that system number is just a leading zero
             const beforeIndex = k - beforeLengthDelta;
-            beforeCodes[index] = beforeIndex < 0 ? 0 : system.code(before[beforeIndex]);
+            beforeCodes[index] = beforeIndex < 0 ? 0 : utils.code(system, before[beforeIndex]);
             const afterIndex = k - afterLengthDelta;
-            afterCodes[index] = afterIndex < 0 ? 0 : system.code(after[afterIndex]);
+            afterCodes[index] = afterIndex < 0 ? 0 : utils.code(system, after[afterIndex]);
         }
     });
 
     // Restores the code to a string
     let final: string = "";
-    for (let i = valueCodes.upperBound; i >= valueCodes.lowerBound; i--) final += system.char(valueCodes[i]);
+    for (let i = valueCodes.upperBound; i >= valueCodes.lowerBound; i--) final += utils.char(system, valueCodes[i]);
 
     // Finally return the precomputed value plus the final value
     return precomputed + final;
