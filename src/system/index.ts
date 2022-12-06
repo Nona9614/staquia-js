@@ -1,14 +1,3 @@
-import system from "./system";
-import after from "./after";
-import before from "./before";
-import between from "./between";
-import diverge, { criteria } from "./diverge";
+import createNumberSystem from "./system";
 
-export {
-    system,
-    after,
-    before,
-    criteria,
-    diverge,
-    between
-}
+export default createNumberSystem;
