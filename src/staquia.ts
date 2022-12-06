@@ -1,6 +1,23 @@
-import StaquiaPosition from './staquia-position';
-import { system } from './system';
-import { sizes } from "./staquia-position";
+import { merge } from "lodash";
+
+import Position from './position';
+import createNumberSystem from "./system";
+import type { RequiredRecursive, StaquiaSettings, PositionValue, ThreseholdHandler, OverflowHandler, NumberSystem } from './types';
+
+const defaultSettings: RequiredRecursive<StaquiaSettings> = {
+  zero: "!",
+  first: "\u00B0",
+  last: "\u04B1",
+  ϰ: 0.15,
+  segments: {
+    /** `N` segment length */
+    n: 5,
+    /** `Z` segment length */
+    z: 15,
+  },
+  onThreshold(trigger) {},
+  onOverflow(trigger) {},
+}
 
 /**
  * A class that helps to have a dynamic position algorith using number systems
@@ -18,48 +35,34 @@ import { sizes } from "./staquia-position";
  */
 export class Staquia {
 
-    public static set zero(value: string) {
-        system.update({ zero: value });
-    };
+  /** Sytem used to forge positions */
+  #system: NumberSystem;
 
-    public static get zero() {
-        return system.zero;
-    };
+  /** Callback to trigger when entering the threshold */
+  #onThreshold: ThreseholdHandler
 
-    public static set first(value: string) {
-        system.update({ first: value });
-    };
+  /** Callback to trigger during an overflow */
+  #onOverflow: OverflowHandler
 
-    public static get first() {
-        return system.first;
-    };
+  constructor(settings?: StaquiaSettings) {
+    const _settings = settings ? merge(defaultSettings, settings) : defaultSettings;
+    this.#system = createNumberSystem(_settings);
+    this.#onThreshold = _settings.onThreshold;
+    this.#onOverflow = _settings.onOverflow;
+  }
 
-    public static set last(value: string) {
-        system.update({ last: value });
-    };
-
-    public static get last() {
-        return system.last;
-    };
-
-    /** Updates the numeric system that will be used */
-    public static update(options: { first?: string, last?: string, zero?: string }) {
-        system.update(options);
-    };
-
-    /** Updates the sizes from the system */
-    public static set size(value: { n: number, z: number }) {
-        sizes.update(value);
+  /** Forges a new position */
+  forge(value?: PositionValue) {
+    const position = new Position(this.#system, value);
+    const length = [...position.toString()].length;
+    if (this.#system.lmax >= length) {
+      this.#onOverflow(position, new Error(`The generated position '${position}' caused an overflow`));
     }
+    else if (this.#system.lϰ >= length) this.#onThreshold(position);
+    return position;
+  }
 
-    /** Gets the size from the system */
-    public static get size() {
-        return {
-            n: sizes.n,
-            z: sizes.z,
-        }
-    }
 }
 
 // Force to export the settings here for rollup to expose them
-export { StaquiaPosition }
+export default Staquia;
