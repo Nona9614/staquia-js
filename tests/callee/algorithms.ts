@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import _ from "../create-callee";
 import type { NumberSystem } from "../../src/types";
-import type { TestAlgorithm, TestName } from "../types";
+import type { TestAlgorithms, TestName } from "../types";
 
 import {
   after,
@@ -12,8 +12,8 @@ import {
 } from "../../src/system/algorithms";
 
 export default function createAlgorithmTest(
-  key: TestAlgorithm,
-  system: NumberSystem
+  key: TestAlgorithms,
+  system: NumberSystem,
 ) {
   switch (key) {
     case "after":

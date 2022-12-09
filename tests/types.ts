@@ -28,9 +28,7 @@ type PositionObject = {
 
 type After = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string
   },
   string
@@ -38,9 +36,7 @@ type After = GeneralTest<
 
 type Before = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string
   },
   string
@@ -48,9 +44,7 @@ type Before = GeneralTest<
 
 type Between = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     before: string,
     after: string,
     round: boolean
@@ -60,9 +54,7 @@ type Between = GeneralTest<
 
 type Diverge = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     before: string,
     after: string
   },
@@ -71,9 +63,7 @@ type Diverge = GeneralTest<
 
 type Criteria = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string,
     before: string,
     after: string
@@ -81,11 +71,29 @@ type Criteria = GeneralTest<
   boolean
 >;
 
+type OnThreshold = GeneralTest<
+  {
+    _id: string,
+    before: string,
+    next: string,
+    trigger: string
+  },
+  boolean
+>;
+
+type OnOverflow = GeneralTest<
+  {
+    _id: string,
+    before: string,
+    next: string,
+    trigger: string
+  },
+  boolean
+>;
+
 type Core = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     before: string,
     after: string
   },
@@ -94,9 +102,7 @@ type Core = GeneralTest<
 
 type Previous = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string
   },
   string
@@ -104,9 +110,7 @@ type Previous = GeneralTest<
 
 type Next = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string
   },
   string
@@ -114,9 +118,7 @@ type Next = GeneralTest<
 
 type ToObject = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: string
   },
   object
@@ -124,9 +126,7 @@ type ToObject = GeneralTest<
 
 type ToString = GeneralTest<
   {
-    _id: {
-
-    },
+    _id: string,
     value: {
       n: string,
       z: string
@@ -135,20 +135,78 @@ type ToString = GeneralTest<
   string
 >;
 
+type ToEquals = GeneralTest<
+  {
+    _id: string,
+    value: {
+      n: string,
+      z: string
+    },
+    equals: string
+  },
+  boolean
+>;
 
-export type TestAlgorithm = "after" | "before" | "between" | "diverge" | "criteria";
-export type TestPosition = "core" | "previous" | "next" | "toObject" | "toString";
-export type TestName = TestAlgorithm | TestPosition;
+type ValueOf = GeneralTest<
+  {
+    _id: string,
+    before: string,
+    after: string,
+    greater: boolean
+  },
+  boolean
+>;
 
-export const isAlgorithmTest = (value: string): value is TestAlgorithm => value === "after" || value === "before" || value === "between" || value === "diverge" || value === "criteria"
-export const isPositionTest = (value: string): value is TestPosition => value === "core" || value === "previous" || value === "next" || value === "toObject" || value === "toString"
+type Update = GeneralTest<
+  {
+    _id: string,
+    original: string,
+    update: string
+  },
+  string
+>;
 
-export type Test<T extends TestName> = T extends 'after' ? After : T extends 'before' ? Before : T extends 'between' ? Between : T extends 'diverge' ? Diverge : T extends 'criteria' ? Criteria : T extends 'core' ? Core : T extends 'previous' ? Previous : T extends 'next' ? Next : T extends 'toObject' ? ToObject : T extends 'toString' ? ToString : never;
+type IsPosition = GeneralTest<
+  {
+    _id: string,
+    value: {
+      n: string,
+      z: string
+    }
+  },
+  boolean
+>;
+
+type IsPositionObject = GeneralTest<
+  {
+    _id: string,
+    value: {
+      n: string,
+      z: string
+    }
+  },
+  boolean
+>;
+
+
+export type TestAlgorithms = 'after' | 'before' | 'between' | 'diverge' | 'criteria';
+export type TestHandlers = 'onThreshold' | 'onOverflow';
+export type TestPosition = 'core' | 'previous' | 'next' | 'toObject' | 'toString' | 'toEquals' | 'valueOf' | 'update';
+export type TestSchemas = 'isPosition' | 'isPositionObject';
+
+export type TestName = TestAlgorithms | TestHandlers | TestPosition | TestSchemas;
+export const isAlgorithmsTest = (value: string): value is TestAlgorithms => value === "after" || value === "before" || value === "between" || value === "diverge" || value === "criteria";
+export const isHandlersTest = (value: string): value is TestHandlers => value === "onThreshold" || value === "onOverflow";
+export const isPositionTest = (value: string): value is TestPosition => value === "core" || value === "previous" || value === "next" || value === "toObject" || value === "toString" || value === "toEquals" || value === "valueOf" || value === "update";
+export const isSchemasTest = (value: string): value is TestSchemas => value === "isPosition" || value === "isPositionObject";
+
+export type Test<T extends TestName> = T extends 'after' ? After : T extends 'before' ? Before : T extends 'between' ? Between : T extends 'diverge' ? Diverge : T extends 'criteria' ? Criteria : T extends 'onThreshold' ? OnThreshold : T extends 'onOverflow' ? OnOverflow : T extends 'core' ? Core : T extends 'previous' ? Previous : T extends 'next' ? Next : T extends 'toObject' ? ToObject : T extends 'toString' ? ToString : T extends 'toEquals' ? ToEquals : T extends 'valueOf' ? ValueOf : T extends 'update' ? Update : T extends 'isPosition' ? IsPosition : T extends 'isPositionObject' ? IsPositionObject : never;
 
 type UnArray<T> = T extends Array<infer U> ? U : T;
 export type Callback<T extends TestName> = (
   this: Mocha.Context,
-  item: UnArray<Test<T>["items"]>
-) => void;
+  item: Omit<UnArray<Test<T>["items"]>, '_id' | 'message' | 'skip'>,
+  done: (err?: Error) => void,
+) => boolean | void;
 
 export type Spies = { [T in TestName]: Test<T> };
