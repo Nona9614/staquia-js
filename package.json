@@ -1,6 +1,6 @@
 {
   "name": "staquia",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The best library for tables and lists.",
   "main": "staquia.js",
   "types": "staquia.d.ts",
@@ -26,7 +26,8 @@
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "xufs": "^0.2.1"
   },
   "dependencies": {
     "guardex": "^1.6.3",
