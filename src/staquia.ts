@@ -37,6 +37,11 @@ class Staquia {
     const position = new Position(this.#system, value);
     return position;
   }
+
+  /** Returns a readonly system object */
+  get system() {
+    return this.#system;
+  }
 }
 
 /** Global staquia instance */
@@ -47,7 +52,7 @@ let _instance = new Staquia();
  * You can read more information in the documentation at:
  * @link https://github.com/Nona9614/staquia-js
  */
-const staquia = {
+export const staquia = {
   /**
    * Updates the staquia settings
    * @example
@@ -98,7 +103,14 @@ const staquia = {
   position(value?: PositionValue) {
     return _instance.position(value);
   },
+  /**
+   * This `readonly` object is from the internal number system
+   * that uses staquia to generate the positions
+   */
+  get system() {
+    return _instance.system;
+  },
 };
 
-// Force to export the settings here for rollup to expose them
+// Exports staquia as default
 export default staquia;
