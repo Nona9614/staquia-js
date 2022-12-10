@@ -5,12 +5,15 @@ import copy from 'rollup-plugin-copy';
 /** @type {import('rollup').RollupOptions[]} */
 const config = [
   {
-    input: 'src/staquia.ts',
+    input: 'src/index.ts',
     output: {
+      name: 'staquia.js',
       dir: 'lib',
       format: 'cjs',
+      exports: 'named'
     },
-    plugins: [ ts(), copy({
+    external: ["guardex", "lodash"],
+    plugins: [ts(), copy({
       targets: [
         { src: 'README.md', dest: 'lib/' },
         { src: 'package.json', dest: 'lib/' },
