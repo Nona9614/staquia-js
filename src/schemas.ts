@@ -49,7 +49,7 @@ export function isPositionObject(value?: any) {
 }
 
 export function isPosition(value?: any) {
-  if (value instanceof Position && value.symbol === symbol) {
+  if (is.value(value) && value instanceof Position && value.symbol === symbol) {
     const { n, z } = value.toObject();
     return is.smallerOrEqual(n.length, _ln) && is.smallerOrEqual(z.length, _lz);
   } else return false;
