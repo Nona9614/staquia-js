@@ -1,6 +1,11 @@
 import is from "guardex";
 
-import type { NumberSystem, PositionObject, PositionValue } from "./types";
+import type {
+  NumberSystem,
+  PositionObject,
+  PositionObjectResult,
+  PositionValue,
+} from "./types";
 
 // Utils
 import utils from "./system/utils";
@@ -15,10 +20,25 @@ import { isPosition, isPositionObject } from "./schemas";
 import { symbol } from "./symbol";
 
 /**
- * This objects represents a postion like `zzzzsssssssss` where:
- *  - N are the numbered position
- *  - Z is a special string generated when an insertion between
- *    two positions with no room
+ * @protected
+ * This objects represents a postion instace that can be divided in:
+ *  - `n` as the part that helps the position to move up and down
+ *  - `z` as the part that helps to expand on reinsertions
+ *
+ * Each instance contains functions that helps to get the
+ * next, previous or even between positions values.
+ * Plus validation and comparation logic.
+ *
+ * By default this position will be generated using the
+ * defined `staquia` number sytem as reference.
+ *
+ * @example
+ * import { staquia } from "staquia";
+ *
+ * // Create an instance directly from the global staquia instance,
+ * const position = staquia.position();
+ *
+ *
  */
 export default class Position {
   /** Left number for after and before operations */
@@ -27,17 +47,25 @@ export default class Position {
   #z: string = "";
   /** Reference number sytem */
   #system: NumberSystem;
-  /** Symbol used to check if it is a valid position */
+  /**
+   * @readonly
+   * Unique symbol attached to every position instance, helps to validate that
+   * an object is a `pure` position and it was not instanciated with another
+   * seemingly class or prototype
+   */
   get symbol() {
     return symbol;
   }
 
   /** Determines if an object is a position instance */
-  static isPosition = (value?: any): value is Position => isPosition(value);
+  static isPosition(value?: any): value is Position {
+    return isPosition(value);
+  }
 
   /** Determines if a plain object is a valid position object */
-  static isPositionObject = (value?: any): value is PositionObject =>
-    isPositionObject(value);
+  static isPositionObject(value?: any): value is PositionObject {
+    return isPositionObject(value);
+  }
 
   /**
    * @param system The number system to use for the position functions
@@ -72,6 +100,9 @@ export default class Position {
 
   /**
    * Gets the relative next position from another position
+   * @example
+   * // The character "a" is followed by "b" in the unicode standard
+   * const nnnb = staquia.position("nnna").next();
    */
   public next() {
     const n = after(this.#system, this.#n);
@@ -80,6 +111,9 @@ export default class Position {
 
   /**
    * Gets the relative next position from another position
+   * @example
+   * // The character "b" is followed by "a" in the unicode standard
+   * const nnna = staquia.position("nnnb").next();
    */
   public previous() {
     const n = before(this.#system, this.#n);
@@ -89,6 +123,24 @@ export default class Position {
   /**
    * Returns the value that lies between the current postion and another
    * @param relative The position that should go before or after thi current position
+   * @example
+   * import { staquia } from "staquia";
+   *
+   * // Given a system like this
+   * let zero = "!"; // Would be like 0
+   * let first = "a"; // Would be like 1
+   * let middle = "n"; // Would be like 14
+   * let last = "z"; // Would be like 26
+   *
+   * // The middle character between two positions
+   * // can be seen as Math.ceil((first + last) / 2);
+   * let n = staquia.position(first).core(last); // Will result in "n"
+   *
+   * // When there is no room between 2 positions, the "middle" value
+   * // from the system will be attached to the last position.
+   * // This is where the "threshold" and "overflow" handling
+   * // logic will be applied
+   * let am = staquia.position("a").core("b"); // Will result in "am"
    */
   public core(relative: Position | PositionValue) {
     let previous: Position = this;
@@ -130,16 +182,30 @@ export default class Position {
   /**
    * Updates the position based on an input value
    */
-  public update(value: string | { n?: string; z?: string }) {
+  public update(value: string | Partial<PositionObject>) {
     if (is.string(value)) {
       this.#parse(value);
     } else if (Position.isPositionObject(value)) {
       this.#parse(value.n + (value.z ?? ""));
-    } else throw new Error("Canont update position from an invalid value");
+    } else
+      throw new Error(
+        `Canont update position from an invalid value ${JSON.stringify(value)}`,
+      );
   }
 
   /**
-   * Use as value of the string transformation
+   * With this function the position instances can be compared
+   * as plain `strings` with the less than `<` and greater than `>`
+   * operators
+   * @example
+   *
+   * // Create your positions
+   * const a = staquia.position("a");
+   * const b = staquia.position("b");
+   *
+   * // Just compare them as plain objects
+   * a < b // Will return false
+   * a > b // Will return true
    */
   public valueOf() {
     return this.toString();
@@ -147,6 +213,19 @@ export default class Position {
 
   /**
    * Concatenates the `n` value with the `z`
+   * @example
+   *
+   * // Asuming the "n" segment length is like below
+   * let ln = 5;
+   *
+   * // Create it as an object
+   * const position = staquia.position({
+   *  n: "n",
+   *  z: "zzzz",
+   * });
+   *
+   * // Will print "!!!!nzzzz" as will attach leading zeroes
+   * const string = position.toString();
    */
   public toString() {
     return utils.isZero(this.#system, this.#z) ? this.#n : this.#n + this.#z;
@@ -154,8 +233,21 @@ export default class Position {
 
   /**
    * Gets the `n`  and `z` values
+   * @example
+   * // Asuming the "n" segment length is like below
+   * let ln = 5;
+   *
+   * // Create it as a string
+   * const position = staquia.position("n");
+   * postion.toObject
+   *
+   * // Will look like this
+   * let object = {
+   *  n: "!!!!n",
+   *  z: "!"
+   * }
    */
-  public toObject() {
+  public toObject(): PositionObjectResult {
     return {
       n: this.#n,
       z: this.#z,
@@ -167,6 +259,23 @@ export default class Position {
 
   /**
    * Compares an object or a string to see if it is equals to the current instance
+   * @param value The value to compare against
+   * @example
+   *
+   * const original = staquia.position("nnnnnz");
+   *
+   * // Can be compared with another instance
+   * const instance = staquia.position("nnnnnz");
+   * original.toEquals(instance);
+   *
+   * // Can be compared with a valid position string
+   * const string = "nnnnnz";
+   * original.toEquals(string);
+   *
+   * // Can be compared with a valid position object
+   * const object = { n: "nnnnn", z: "z"};
+   * original.toEquals(object);
+   *
    */
   toEquals(value: Position | PositionValue) {
     if (is.string(value)) {
@@ -180,3 +289,5 @@ export default class Position {
     }
   }
 }
+
+export { Position };

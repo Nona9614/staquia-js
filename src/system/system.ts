@@ -1,4 +1,5 @@
-import type { NumberSystem, NumberSystemSettings, RequiredRecursive } from "../types";
+import type { NumberSystem, NumberSystemSettings } from "../types";
+import type { RequiredRecursive } from "../types-internal";
 
 /**
  * Creates a number system
@@ -10,11 +11,10 @@ function createNumberSystem({
   ϰ,
   segments,
 }: RequiredRecursive<NumberSystemSettings>): NumberSystem {
-  
   const firstUnicodeNumber = first.charCodeAt(0);
   const lastUnicodeNumber = last.charCodeAt(0);
   const middleUnicodeNumber = Math.ceil(
-    (firstUnicodeNumber + lastUnicodeNumber) / 2
+    (firstUnicodeNumber + lastUnicodeNumber) / 2,
   );
 
   const ln = segments.n;
@@ -36,7 +36,6 @@ function createNumberSystem({
     lϰ: Math.ceil((1 - ϰ) * lmax),
     base: lastUnicodeNumber - firstUnicodeNumber + 2,
   });
-
 }
 
 export default createNumberSystem;
