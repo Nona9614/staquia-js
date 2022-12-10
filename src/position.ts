@@ -11,7 +11,8 @@ import diverge from "./system/algorithms/diverge";
 import after from "./system/algorithms/after";
 import before from "./system/algorithms/before";
 import { handlers } from "./handlers";
-import { isPosition, isPositionObject, symbol } from "./schemas";
+import { isPosition, isPositionObject } from "./schemas";
+import { symbol } from "./symbol";
 
 /**
  * This objects represents a postion like `zzzzsssssssss` where:

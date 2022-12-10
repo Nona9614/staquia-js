@@ -1,9 +1,7 @@
 // Zod
 import is from "guardex";
 import Position from "./position";
-
-/** Symbol that represents a position */
-export const symbol = Symbol("position");
+import { symbol } from "./symbol";
 
 // Used for validate the schema
 let _ln: number = 0;
