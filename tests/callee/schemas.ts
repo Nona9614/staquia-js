@@ -9,11 +9,9 @@ import type { TestSchemas } from "../types";
 
 import Position from "../../src/position";
 import { handlers } from "../../src/handlers";
-import schemas, {
-  isPosition,
-  isPositionObject,
-  symbol,
-} from "../../src/schemas";
+import schemas, { isPosition, isPositionObject } from "../../src/schemas";
+
+import { symbol } from "../../src/symbol";
 
 export default function createSchemasTest(
   key: TestSchemas,
