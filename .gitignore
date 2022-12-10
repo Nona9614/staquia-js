@@ -10,3 +10,6 @@ lib
 
 # Temporal folder
 temp
+
+# Environment files
+.env
