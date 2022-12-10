@@ -1,5 +1,5 @@
 {
-  "include": [ "src/**/*.ts" ],
+  "include": ["src/**/*.ts", "docs.ts", "docs.ts"],
   "exclude": ["node_modules", "**/tests", "**/*.spec.ts"],
   "compilerOptions": {
     "strict": true,
@@ -14,17 +14,15 @@
     // normally they are ignored as source files
     "allowJs": true,
     // Generate d.ts files
-    "declaration": true,
+    "declaration": true
   },
-  "files": [
-    "src/staquia.ts"
-  ],
+  "files": ["src/index.ts"],
   "ts-node": {
     "compilerOptions": {
       "resolveJsonModule": true,
       "esModuleInterop": true,
       "target": "ES2022",
-      "module": "CommonJS",
+      "module": "CommonJS"
     },
     "files": true
   }
