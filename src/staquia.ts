@@ -7,42 +7,18 @@ import schemas from "./schemas";
 import createNumberSystem from "./system";
 import type { StaquiaSettings, PositionValue, NumberSystem } from "./types";
 
-export class Staquia {
-  /** Sytem used to forge positions */
-  #system: NumberSystem;
-
-  constructor(settings?: StaquiaSettings) {
-    const _settings = settings
-      ? merge(defaultSettings, settings)
-      : defaultSettings;
-    const system = createNumberSystem(_settings);
-    schemas.ln = system.ln;
-    schemas.lz = system.lz;
-    handlers.onThreshold = _settings.onThreshold;
-    handlers.onOverflow = _settings.onOverflow;
-    this.#system = system;
-  }
-
-  start() {
-    let n = "";
-    for (let i = 0; i < this.#system.ln; i++) {
-      n += this.#system.middle;
-    }
-    return this.position(n);
-  }
-
-  position(value?: PositionValue) {
-    const position = new Position(this.#system, value);
-    return position;
-  }
-
-  get system() {
-    return this.#system;
-  }
+/** Builds a number system and exposes its values to the global values */
+function setup(settings?: StaquiaSettings) {
+  const _settings = settings
+    ? merge(defaultSettings, settings)
+    : defaultSettings;
+  const system = createNumberSystem(_settings);
+  schemas.ln = system.ln;
+  schemas.lz = system.lz;
+  handlers.onThreshold = _settings.onThreshold;
+  handlers.onOverflow = _settings.onOverflow;
+  return system;
 }
-
-/** Global staquia instance */
-let _instance = new Staquia();
 
 /**
  * @module
@@ -50,7 +26,14 @@ let _instance = new Staquia();
  * You can read more information of how to use it
  * in the [staquia](https://nona9614.github.io/staquia-js/) documentation page
  */
-export const staquia = {
+export class Staquia {
+  /** Sytem used to forge positions */
+  #system: NumberSystem;
+
+  constructor(settings?: StaquiaSettings) {
+    this.#system = setup(settings);
+  }
+
   /**
    * Updates the staquia settings such as the number system values
    * or the `threshold` and `overflow` handlers
@@ -69,8 +52,8 @@ export const staquia = {
    * const ϰ = 0.15;
    */
   setup(settings?: StaquiaSettings) {
-    _instance = new Staquia(settings);
-  },
+    this.#system = setup(settings);
+  }
   /**
    * Creates a recommended start position to depart,
    * to have the most possible position forges
@@ -84,8 +67,12 @@ export const staquia = {
    * const nnnnn = staquia.start();
    */
   start() {
-    return _instance.start();
-  },
+    let n = "";
+    for (let i = 0; i < this.#system.ln; i++) {
+      n += this.#system.middle;
+    }
+    return this.position(n);
+  }
   /**
    * Creates a new position based on the current number system
    * @param value The reference `string` or `object` to create a position
@@ -106,14 +93,17 @@ export const staquia = {
    * staquia.position("a") < staquia.position("b")
    */
   position(value?: PositionValue) {
-    return _instance.position(value);
-  },
+    return new Position(this.#system, value);
+  }
   /**
    * @readonly
    * This `readonly` object is from the internal number system
    * that uses staquia to generate the positions
    */
   get system() {
-    return _instance.system;
-  },
-};
+    return this.#system;
+  }
+}
+
+const staquia = new Staquia();
+export default staquia;

@@ -1,20 +1,6 @@
 import Position from "./position";
 
 /**
- * The `CodeNumber` values are just a number representation from any based numeric system.
- * Each index represents the corresponding position in such and the value the number corresponding to that position.
- * @example
- * // The base 10 number 123 is equal to (1*10^2) + (2*10^1) + (3*10^0)
- * // meaning that, would be stored within the object like:
- * const n123_b10 = {
- *     0: 3,
- *     1: 2,
- *     2: 1,
- * }
- */
-export type CodeNumber = { [key: number]: number };
-
-/**
  * Callback to warn the sytem when a position had
  * reached the length lϰ and is
  * about to cause an overflow
@@ -65,7 +51,7 @@ export type StaquiaSettings = NumberSystemSettings & {
 };
 
 /** Object representation from a position */
-export type PositionObject = {
+export type PositionSegments = {
   /** The `n` segment string from a position */
   n: string;
   /** The `z` segment string from  a position */
@@ -75,20 +61,20 @@ export type PositionObject = {
 /**
  * Plain `Object` that represents an instance of a position
  */
-export type PositionObjectResult = Required<PositionObject> & {
+export interface PositionObject extends Required<PositionSegments> {
   /** Unique `symbol` from a valid object position instance */
   symbol: Symbol;
-};
+}
 
 /** Possible value representation from a position */
-export type PositionValue = string | PositionObject;
+export type PositionValue = string | PositionSegments;
 
 /**
- * By default `Staquia` has a generic optimized settings,
- * to have settings that are meant to a specific project,
- * refer to the online documentation.
+ * By default `Staquia` has a generic optimized number system,
+ * to have settings that are meant to a specific project
+ * go to the online [documentation](https://nona9614.github.io/staquia-js).
  */
-export type NumberSystem = {
+export interface NumberSystem {
   /** The unicode character that represents the zero value */
   zero: string;
 
@@ -134,4 +120,4 @@ export type NumberSystem = {
    * the sytem will fire a warning message
    */
   lϰ: number;
-};
+}

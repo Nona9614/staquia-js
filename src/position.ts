@@ -2,8 +2,8 @@ import is from "guardex";
 
 import type {
   NumberSystem,
+  PositionSegments,
   PositionObject,
-  PositionObjectResult,
   PositionValue,
 } from "./types";
 
@@ -20,7 +20,6 @@ import { isPosition, isPositionObject } from "./schemas";
 import { symbol } from "./symbol";
 
 /**
- * @protected
  * This objects represents a postion instace that can be divided in:
  *  - `n` as the part that helps the position to move up and down
  *  - `z` as the part that helps to expand on reinsertions
@@ -63,7 +62,7 @@ export default class Position {
   }
 
   /** Determines if a plain object is a valid position object */
-  static isPositionObject(value?: any): value is PositionObject {
+  static isPositionObject(value?: any): value is PositionSegments {
     return isPositionObject(value);
   }
 
@@ -182,7 +181,7 @@ export default class Position {
   /**
    * Updates the position based on an input value
    */
-  public update(value: string | Partial<PositionObject>) {
+  public update(value: string | Partial<PositionSegments>) {
     if (is.string(value)) {
       this.#parse(value);
     } else if (Position.isPositionObject(value)) {
@@ -247,7 +246,7 @@ export default class Position {
    *  z: "!"
    * }
    */
-  public toObject(): PositionObjectResult {
+  public toObject(): PositionObject {
     return {
       n: this.#n,
       z: this.#z,
