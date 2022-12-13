@@ -1,9 +1,16 @@
 {
   "name": "staquia",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The best library for tables and lists.",
-  "main": "staquia.js",
-  "types": "index.d.ts",
+  "main": "cjs/index.cjs",
+  "module": "esm/index.mjs",
+  "types": "esm/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./esm/index.mjs",
+      "require": "./cjs/index.cjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Nona9614/staquia"
@@ -28,7 +35,7 @@
     "xufs": "^0.2.1"
   },
   "dependencies": {
-    "guardex": "^1.6.3",
+    "guardex": "^1.6.5",
     "lodash": "^4.17.21"
   },
   "scripts": {
