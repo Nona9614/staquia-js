@@ -1,10 +1,12 @@
 {
-  "include": ["src/**/*.ts", "docs.ts", "docs.ts"],
-  "exclude": ["node_modules", "**/tests", "**/*.spec.ts"],
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "lib", "**/tests", "**/*.spec.ts", "docs/**/*"],
   "compilerOptions": {
     "strict": true,
+    "resolveJsonModule": true,
     "module": "EsNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
     "target": "ES2022",
     // Types should go into this directory.
     // Removing this would place the .d.ts files
@@ -16,14 +18,5 @@
     // Generate d.ts files
     "declaration": true
   },
-  "files": ["src/index.ts"],
-  "ts-node": {
-    "compilerOptions": {
-      "resolveJsonModule": true,
-      "esModuleInterop": true,
-      "target": "ES2022",
-      "module": "CommonJS"
-    },
-    "files": true
-  }
+  "files": ["src/index.ts"]
 }

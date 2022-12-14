@@ -19,7 +19,10 @@ import createAlgorithmTest from "./callee/algorithms";
 import createPositionTest from "./callee/position";
 import createHandlersTest from "./callee/handlers";
 import createSchemasTest from "./callee/schemas";
-import { expect } from "chai";
+
+// System
+import url from "url";
+import numberSystem from "./mocks/system.json" assert { type: "json" };
 
 function capitalize(value: string) {
   const subs = value.substring(0, 1).toLocaleUpperCase();
@@ -32,16 +35,17 @@ function capitalize(value: string) {
   return subs + computed;
 }
 
-const stack: ((this: Mocha.Suite) => void)[] = [];
+const stack: { description: string; test: Test<any>; callee: Callback<any> }[] =
+  [];
 
 let self: any = this;
-function exec() {
-  const system = createNumberSystem(require(`./mocks/system.json`));
+async function collect() {
+  const system = createNumberSystem(numberSystem);
   const isSystemFile = (pathname: string) => pathname.includes("system.json");
 
-  throuSync(
+  await throu(
     {
-      watcher: (pathname) => {
+      watcher: async (pathname) => {
         if (!isSystemFile(pathname)) {
           const key = path
             .basename(pathname)
@@ -60,26 +64,14 @@ function exec() {
             throw new Error(`Test '${key}' has no implementation`);
           }
 
-          let test = require(pathname) as Test<typeof key>;
-          let description = capitalize(`${key} Testing`);
+          const testPath = url.pathToFileURL(pathname).toString();
+          let test = (await import(testPath, {
+            assert: { type: "json" },
+          })) as any;
+          if (test.default) test = test.default;
+          const description = capitalize(`${key} Testing`);
 
-          stack.push(function () {
-            describe(description, function () {
-              const { items, skip } = test;
-
-              this.beforeAll(function () {
-                if (skip) this.skip();
-              });
-
-              for (const item of items) {
-                it(item.message, function (done) {
-                  if (item.skip) this.skip();
-                  const open = callee.call(this, item, done);
-                  if (!open) done();
-                });
-              }
-            });
-          });
+          stack.push({ test, description, callee });
         }
       },
       observe: "files",
@@ -89,12 +81,24 @@ function exec() {
 }
 
 try {
-  exec();
-  for (const task of stack) {
-    task.call(self);
+  await collect();
+  for (const { description, callee, test } of stack) {
+    describe(description, function () {
+      const { items, skip } = test;
+
+      this.beforeAll(function () {
+        if (skip) this.skip();
+      });
+
+      for (const item of items) {
+        it(item.message, function (done) {
+          if (item.skip) this.skip();
+          const open = callee.call(this, item, done);
+          if (!open) done();
+        });
+      }
+    });
   }
 } catch (error) {
   console.error(error);
 }
-
-// exec();
