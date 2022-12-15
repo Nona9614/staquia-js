@@ -1,6 +1,6 @@
 {
   "name": "staquia",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The best library for tables and lists.",
   "type": "module",
   "main": "cjs/index.cjs",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",
-    "@types/lodash": "^4.14.190",
+    "@types/lodash-es": "^4.17.6",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.11.12",
     "chai": "^4.3.6",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "guardex": "^1.6.6",
-    "lodash": "^4.17.21"
+    "lodash-es": "^4.17.21"
   },
   "scripts": {
     "bundle": "node rollup.config.mjs",

@@ -1,4 +1,4 @@
-import { merge } from "lodash";
+import { merge } from "lodash-es";
 import { defaultSettings } from "./default-settings";
 import { handlers } from "./handlers";
 
