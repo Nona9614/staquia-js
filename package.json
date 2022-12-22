@@ -1,6 +1,6 @@
 {
   "name": "staquia",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "The best library for tables and lists.",
   "type": "module",
   "main": "cjs/index.cjs",

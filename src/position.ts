@@ -150,8 +150,8 @@ export default class Position {
     // Set the proper weight
     if (previous > next) {
       const temp = previous;
-      next = previous;
-      previous = temp;
+      previous = next;
+      next = temp;
     }
 
     // If there is not enough room (above 1) use diverge,
