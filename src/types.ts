@@ -16,7 +16,7 @@ export type ThreseholdHandler = (trigger: Position) => void;
 export type OverflowHandler = (trigger: Position, error: Error) => void;
 
 /**
- * Setttings from the number system
+ * Settings from the number system
  */
 export type NumberSystemSettings = {
   /** The unicode character that represents the `first` value in the set */
@@ -70,8 +70,8 @@ export interface PositionObject extends Required<PositionSegments> {
 export type PositionValue = string | PositionSegments;
 
 /**
- * By default `Staquia` has a generic optimized number system,
- * to have settings that are meant to a specific project
+ * By default `Staquia` has a generic optimized number system.
+ * To have settings that are meant to a specific project
  * go to the online [documentation](https://nona9614.github.io/staquia-js).
  */
 export interface NumberSystem {

@@ -1,8 +1,8 @@
 import Position from "./position";
-import { staquia } from "./staquia";
+import { Staquia } from "./staquia";
 
 // Export types
 export * from "./types";
 
 // Named exports
-export { staquia, Position };
+export { Staquia, Position };
