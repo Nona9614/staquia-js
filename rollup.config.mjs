@@ -21,7 +21,7 @@ async function build() {
 
   /** @type {import('rollup').InputOptions} */
   const inputOptions = {
-    input: "src/index.ts",
+    input: "src/exports/index.ts",
     external: ["guardex"],
     plugins: [ts(), copy({
       targets: [
@@ -86,8 +86,8 @@ async function buildMinified() {
    * Is enough to use the ESM bundled lib as input
    */
   const inputOptions = {
-    input: lib('esm', 'index.mjs'),
-    plugins: [terser(), node()]
+    input: 'src/exports/umd.ts',
+    plugins: [terser(), node(), ts()]
   };
 
   /** @type {import('rollup').OutputOptions[]} */
