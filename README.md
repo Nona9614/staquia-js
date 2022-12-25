@@ -1,8 +1,34 @@
 # Staquia
 
-This is a configurable lexicographic **position** based algorithm, used to get the core, next or previous number for a nth base number system.
+This is a configurable lexicographic **position** based algorithm, used to get the core, next or previous number for a nth base number system. This project was created with the intention to solve the reinsertion and sorting problem when using long lists.
 
-This project was created with the intention to solve
+To have a full detailed explanation you can go to the [documentation site](https://nona9614.github.io/staquia-js/).
+
+You can install it like below.
+
+```npm
+  npm install staquia --save-dev
+```
+
+Or use it from the `unpkg` cdn as a simple script tag via the browser.
+
+```html
+  <script src="https://unpkg.com/staquia@'<version/>'/umd/index.js"><script/>
+```
+
+This exposes a global `staquia` function that works exactly the same way as the `ECMA` import version.
+
+All of the examples in this document uses `ECMA` syntax to import or export code from the library, but this supports `CommonJS` syntax as well.
+
+```js
+// ECMA Syntax
+import { staquia } from "staquia";
+
+// CommonJS Syntax
+const { staquia } = require("staquia");
+```
+
+## Settings
 
 You can pass as settings the options to create the best system that fits your needs.
 
@@ -87,4 +113,4 @@ const am = a.core(b);
 console.log("The following character is ", am);
 ```
 
-Above explains how the position systems works but there is more if you want to get the full power from this algorithm please visit [documentation site](https://nona9614.github.io/staquia-js/).
+Above explains how the position systems works but there is more if you want to get the full power from this algorithm as mention in the beggining please visit [documentation site](https://nona9614.github.io/staquia-js/).
