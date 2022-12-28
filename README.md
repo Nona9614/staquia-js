@@ -26,6 +26,17 @@ import { staquia } from "staquia";
 
 // CommonJS Syntax
 const { staquia } = require("staquia");
+
+// Some libraries will support conditional imports poorly
+// or not even support it.
+// For these cases you can force the imports like below.
+
+// For ECMA Scripts
+import { staquia } from "staquia/esm";
+// For CommonJS Scripts
+const { staquia } = require("staquia/cjs");
+// For browser applications UMD
+const { staquia } = require("staquia/umd");
 ```
 
 ## Settings

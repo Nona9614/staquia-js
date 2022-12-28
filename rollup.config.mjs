@@ -1,11 +1,11 @@
 // Contents of the file /rollup.config.js
+import path from "path"
 import { empty, read, resolve, write, writeSync } from "xufs";
 import { rollup } from "rollup";
 import ts from 'rollup-plugin-ts';
 import copy from 'rollup-plugin-copy';
 import terser from '@rollup/plugin-terser';
 import { nodeResolve as node } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
 import pkg from './package.json' assert { type: "json" };
 import { replacer } from "dynason";
 
@@ -14,7 +14,7 @@ function lib(...paths) {
   return resolve("lib", ...paths);
 }
 
-const isDeclarationFile = (filename) => /\.d\.[mc]ts$/gui.test(filename);
+const isDeclarationFile = (filename) => /\.d\.[mc]?ts$/gui.test(filename);
 const isSourceMap = (filename) => /\.[cm]?[tj]s\.map$/gui.test(filename);
 
 async function build() {
@@ -44,7 +44,7 @@ async function build() {
       sourcemap: false
     }]
 
-  let isTypesBundledAlready = false;
+  let isGlobalTypesBundledAlready = false;
   // Wmptying folder before start
   await empty(lib(), true)
   // Creating bundle instance
@@ -61,13 +61,16 @@ async function build() {
           writeSync(name, JSON.stringify(_.map));
         }
       } else {
-        // Write only once the declaration file
+        // Write only once the global declaration file
         if (isDeclarationFile(_.fileName)) {
-          if (!isTypesBundledAlready) {
+          if (!isGlobalTypesBundledAlready) {
             const name = lib(_.fileName.replace(/[mc]ts$/, "ts"));
             writeSync(name, _.source);
-            isTypesBundledAlready = true;
-          } else continue;
+            isGlobalTypesBundledAlready = true;
+          }
+          // Write isolated types
+          const name = path.join(path.dirname(outputOption.file), "index.d.ts");
+          writeSync(name, _.source);
         } else if (!isSourceMap(_.fileName)) {
           // Write any other asset to the lib that is not a source map
           const name = lib(_.fileName);
@@ -110,6 +113,12 @@ async function buildMinified() {
           // Write maps if enabled
           const name = `${outputOption.file}.map`;
           writeSync(name, JSON.stringify(_.map));
+        }
+      } else {
+        // Write only once the declaration file
+        if (isDeclarationFile(_.fileName)) {
+          const name = path.join(path.dirname(outputOption.file), "index.d.ts");
+          writeSync(name, _.source);
         }
       }
     }

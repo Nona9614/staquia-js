@@ -1,6 +1,6 @@
 {
   "name": "staquia",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "The best library for tables and lists.",
   "type": "module",
   "main": "cjs/index.cjs",
@@ -11,7 +11,10 @@
       "import": "./esm/index.mjs",
       "require": "./cjs/index.cjs",
       "types": "./index.d.ts"
-    }
+    },
+    "./esm": "./esm/index.mjs",
+    "./cjs": "./cjs/index.cjs",
+    "./umd": "./umd/index.js"
   },
   "repository": {
     "type": "git",
