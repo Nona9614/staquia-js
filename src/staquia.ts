@@ -1,5 +1,4 @@
-import merge from "lodash-es/merge.js";
-import { defaultSettings } from "./default-settings";
+import { ensure } from "./default-settings";
 import { handlers } from "./handlers";
 
 import { Position } from "./position";
@@ -9,9 +8,7 @@ import type { StaquiaSettings, PositionValue, NumberSystem } from "./types";
 
 /** Builds a number system and exposes its values to the global values */
 function setup(settings?: StaquiaSettings) {
-  const _settings = settings
-    ? merge(defaultSettings, settings)
-    : defaultSettings;
+  const _settings = ensure(settings);
   const system = createNumberSystem(_settings);
   schemas.ln = system.ln;
   schemas.lz = system.lz;

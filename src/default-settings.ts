@@ -27,3 +27,23 @@ export const defaultSettings: RequiredRecursive<StaquiaSettings> = {
   /** Default overflow handler when none is set is a `noop`*/
   onOverflow(trigger: Position) {},
 };
+
+/** Merges default settings with the ones input */
+export const ensure = (settings?: StaquiaSettings) => {
+  if (settings) {
+    // Merging depth 0 items
+    let s: any = {
+      ...defaultSettings,
+      ...settings,
+    };
+    // Merging depth 1 items
+    if (s.segments) {
+      s.segments = { ...defaultSettings.segments, ...s.segments };
+    } else {
+      s.segments = defaultSettings.segments;
+    }
+    return s as RequiredRecursive<StaquiaSettings>;
+  } else {
+    return defaultSettings;
+  }
+};
