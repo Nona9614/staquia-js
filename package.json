@@ -1,6 +1,6 @@
 {
   "name": "staquia",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "The best library for tables and lists.",
   "type": "module",
   "main": "cjs/index.cjs",
@@ -12,9 +12,21 @@
       "require": "./cjs/index.cjs",
       "types": "./index.d.ts"
     },
-    "./esm": "./esm/index.mjs",
-    "./cjs": "./cjs/index.cjs",
-    "./umd": "./umd/index.js"
+    "./esm": {
+      "import": "./esm/index.mjs",
+      "require": "./esm/index.mjs",
+      "types": "./index.d.ts"
+    },
+    "./cjs": {
+      "import": "./cjs/index.cjs",
+      "require": "./cjs/index.cjs",
+      "types": "./index.d.ts"
+    },
+    "./umd": {
+      "import": "./umd/index.js",
+      "require": "./umd/index.js",
+      "types": "./index.d.ts"
+    }
   },
   "repository": {
     "type": "git",
@@ -29,7 +41,8 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.11.12",
     "chai": "^4.3.6",
-    "dynason": "^0.2.6",
+    "dotenv": "^16.3.1",
+    "dynason": "^0.3.2",
     "mocha": "^10.2.0",
     "rollup": "^3.7.4",
     "rollup-plugin-copy": "^3.4.0",

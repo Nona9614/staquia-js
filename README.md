@@ -4,25 +4,28 @@ This is a configurable lexicographic **position** based algorithm, used to get t
 
 To have a full detailed explanation you can go to the [documentation site](https://nona9614.github.io/staquia-js/).
 
-You can install it like below.
+You can install with all its dependencies as below.
 
 ```npm
-  npm install staquia --save-dev
+  npm install guardex, staquia --save-dev
 ```
 
-Or use it from the `unpkg` cdn as a simple script tag via the browser.
+Or use it from the `unpkg` cdn as a simple script tag via the browser to have it as a global object named `{umd-name}`.
 
 ```html
-  <script src="https://unpkg.com/staquia@'<version/>'/umd/index.js"><script/>
+<script src="https://unpkg.com/staquia@{version}/umd/index.js"></script>
+<script type="module">
+  console.log({umd-name}); // Now can be used globally in the HTML app
+</script>
 ```
 
-This exposes a global `staquia` function that works exactly the same way as the `ECMA` import version.
+> **Note:** As `umd` must contain only one default exported object, all named imports (like `symbol`) are contained within the global object `{umd-name}`.
 
 All of the examples in this document uses `ECMA` syntax to import or export code from the library, but this supports `CommonJS` syntax as well.
 
 ```js
 // ECMA Syntax
-import { staquia } from "staquia";
+import staquia from "staquia";
 
 // CommonJS Syntax
 const { staquia } = require("staquia");
@@ -32,11 +35,12 @@ const { staquia } = require("staquia");
 // For these cases you can force the imports like below.
 
 // For ECMA Scripts
-import { staquia } from "staquia/esm";
+import staquia from "staquia/esm";
 // For CommonJS Scripts
 const { staquia } = require("staquia/cjs");
 // For browser applications UMD
-const { staquia } = require("staquia/umd");
+import * as staquia from "staquia/umd";
+const staquia = require("staquia/umd");
 ```
 
 ## Settings
