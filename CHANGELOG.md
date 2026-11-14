@@ -2,9 +2,15 @@
 
 Select a Staquia version below to view the changelog history:
 
+- [Unreleased](#Unreleased)
 - [Staquia 0.5.0](#V0.5.0) **Current**
 - [Staquia 0.4.0](#V0.4.0) **Unstable, do not use**
 - [Staquia 0.3.4](#V0.3.4)
+
+## Unreleased
+
+- Added the `module` field to the `package.json` (pointing to the same `index.js`), so tools that don't read `exports` (like Bundlephobia) recognize the package as an ES module. Nothing changes for Node or modern bundlers.
+- The README states the test port (`5681`).
 
 ## V0.5.0
 

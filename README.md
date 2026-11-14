@@ -402,10 +402,17 @@ The project is developed with **pnpm only** (for its supply-chain checks, and be
 pnpm install --frozen-lockfile
 ```
 
-The project uses its own test framework with a web report. Set the `PORT` (and optionally `VERBOSE=true`) in a `.env` file and run:
+The project uses its own test framework with a web report, served on the port `5681`. Set it in a `.env` file at the root of the project (add `VERBOSE=true` to log the errors in the console):
+
+```bash
+# .env
+PORT=5681
+```
+
+Then run:
 
 ```bash
 pnpm run tests
 ```
 
-Then open `http://localhost:<PORT>` to see the report, where the tests are grouped by spec and by group.
+And open `http://localhost:5681` to see the report, where the tests are grouped by spec and by group.
