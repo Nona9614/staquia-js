@@ -1,0 +1,4 @@
+# pnpm only runs the install scripts of the dependencies listed here with `true`.
+# esbuild (used by tsx) doesn't need its script: pnpm installs its platform binary as an optional package.
+allowBuilds:
+  esbuild: false

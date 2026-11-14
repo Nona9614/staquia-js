@@ -1,0 +1,13 @@
+{
+  // The tests are excluded from the library tsconfig (they are not bundled), so they need their own
+  // project: without it the editor checks them without the Node types and can't find "node:assert".
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "..",
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts", "../src/**/*.ts"],
+  "exclude": []
+}

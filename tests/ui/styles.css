@@ -1,0 +1,149 @@
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #343434;
+  color: whitesmoke;
+  --header-height: 56px;
+  --color-bush: hsla(97, 41%, 46%, 1);
+  --color-green: hsla(146, 100%, 43%, 1);
+  --color-blue: rgb(0, 161, 219);
+  --color-red: hsla(0, 100%, 64%, 1);
+}
+
+header {
+  height: var(--header-height);
+  padding-inline: 0.5rem;
+  border-bottom: 1px solid grey;
+  display: grid;
+  align-items: center;
+}
+
+.content {
+  padding-inline: 1rem;
+  height: calc(100% - var(--header-height));
+  width: 100%;
+  overflow: auto;
+}
+
+.play-icon {
+  color: hsla(97, 45%, 32%, 1);
+}
+
+#run-tests-button {
+  cursor: pointer;
+  width: fit-content;
+  padding-inline: 0 12px;
+  color: whitesmoke;
+  font-size: 1.35rem;
+  border: 1px solid gray;
+  border-radius: 4px;
+  background-color: #212121;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  &:hover {
+    background-color: #282828;
+    .play-icon svg {
+      color: var(--color-bush);
+    }
+  }
+}
+
+details > ul {
+  list-style: none;
+  margin-top: 0;
+}
+details summary {
+  cursor: pointer;
+}
+details summary::after {
+  color: grey;
+  content: " (Closed)";
+  display: inline-block;
+}
+details[open] summary::after {
+  content: "";
+}
+
+.specs {
+  font-size: 1.9rem;
+}
+.spec {
+  white-space: nowrap;
+  font-size: 1.7rem;
+}
+.spec--integration {
+  .spec__type {
+    color: hsla(330, 950%, 68%, 1);
+  }
+}
+.spec--unit {
+  .spec__type {
+    color: hsla(42, 100%, 61%, 1);
+  }
+}
+
+.spec__mark,
+.spec__name {
+  font-weight: bolder;
+}
+
+.spec__group {
+  white-space: nowrap;
+  font-size: 1.45rem;
+}
+
+.spec__test {
+  white-space: nowrap;
+  font-size: 1.25rem;
+
+  > div {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+.spec__title {
+  margin-top: 16px;
+  color: whitesmoke;
+}
+.spec__status--failed {
+  summary::marker,
+  .spec__mark,
+  .spec__message {
+    color: var(--color-red);
+  }
+  summary::marker {
+    content: "✖ ";
+  }
+}
+.spec__status--success {
+  summary::marker,
+  .spec__mark,
+  .spec__message {
+    color: var(--color-green);
+  }
+  summary::marker {
+    content: "✔ ";
+  }
+}
+.spec__status--stale {
+  summary::marker,
+  .spec__mark,
+  .spec__message {
+    color: var(--color-blue);
+  }
+  summary::marker {
+    content: "o ";
+  }
+}

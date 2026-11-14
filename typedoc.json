@@ -1,7 +1,7 @@
 {
-  // Comments are supported, like tsconfig.json
   "name": "Staquia API",
   "entryPoints": ["src/docs.ts"],
   "out": "docs/api",
-  "entryPointStrategy": "expand"
+  "entryPointStrategy": "expand",
+  "highlightLanguages": ["bash", "css", "html", "javascript", "js", "json", "jsx", "shell", "sql", "ts", "tsx", "typescript"]
 }
