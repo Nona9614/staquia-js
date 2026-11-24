@@ -4,5 +4,7 @@ import IUnicodes from "../../interfaces/unicodes.js";
 
 /** A character from the system is returned as a code number */
 export default function getCode(this: INumberSystem & IUnicodes & ILexicon, char: string): number {
+  // A set: the digit is the index of its character (-1 when it isn't one, forge validates it first)
+  if (this.set !== undefined) return this.set.indexOf(char);
   return char === this.zero ? 0 : char.charCodeAt(0) - this.firstUnicodeNumber + 1;
 }

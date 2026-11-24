@@ -44,10 +44,24 @@ class NumberSystem implements IComplexSystem {
   ϰ!: number;
 
   base!: number;
+  set?: string;
 
-  static create(crafter: ICrafter, zero: string, first: string, last: string, n: number, z: number, ϰ: number) {
+  /**
+   * @param set The characters when the digits are not a range: the zero followed by every digit, sorted by their
+   * code. A set whose digits are consecutive is stored as that range (`zero`, `first` and `last` come from it).
+   */
+  static create(crafter: ICrafter, zero: string, first: string, last: string, n: number, z: number, ϰ: number, set?: string) {
     const system = new NumberSystem();
     system.number = crafter.number;
+
+    if (set !== undefined) {
+      zero = set[0]!;
+      first = set[1]!;
+      last = set[set.length - 1]!;
+      let consecutive = true;
+      for (let i = 2; i < set.length; i++) consecutive &&= set.charCodeAt(i) === set.charCodeAt(i - 1) + 1;
+      if (!consecutive) system.set = set;
+    }
 
     system.zero = zero;
     system.first = first;
@@ -62,7 +76,7 @@ class NumberSystem implements IComplexSystem {
     system.lz = z;
     system.lmax = system.ln + system.lz;
     system.lϰ = Math.ceil((1 - ϰ) * system.lmax);
-    system.base = system.lastUnicodeNumber - system.firstUnicodeNumber + 2;
+    system.base = system.set !== undefined ? system.set.length : system.lastUnicodeNumber - system.firstUnicodeNumber + 2;
 
     // Each system owns a subclass of the position class, so its string representation
     // is never shared with (or overwritten by) other systems, the signature allows
@@ -74,11 +88,12 @@ class NumberSystem implements IComplexSystem {
           getCharacter: getCharacter.bind({
             zero: system.zero,
             firstUnicodeNumber: system.firstUnicodeNumber,
+            set: system.set,
           }),
         }),
       ),
       // The digits meaning depends on the characters and the fixed `n` length
-      JSON.stringify([system.zero, system.first, system.last, system.ln]),
+      JSON.stringify(system.set !== undefined ? [system.set, system.ln] : [system.zero, system.first, system.last, system.ln]),
     );
 
     return system;

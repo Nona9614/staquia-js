@@ -33,7 +33,7 @@ import type { IPositionError } from "./errors/position-error.js";
 import type { LexicalErrorType } from "./errors/lexical-error.js";
 import type { Result } from "./result.js";
 import type { Item } from "./lists/lexical-item.js";
-import IStaquiaOptions from "./interfaces/options.js";
+import IStaquiaOptions, { IPresetOptions } from "./interfaces/options.js";
 import Ordering from "./unions/ordering.js";
 import HalfMode from "./unions/half-mode.js";
 
@@ -58,6 +58,7 @@ export {
   Result,
   Item,
   IStaquiaOptions,
+  IPresetOptions,
   Ordering,
   HalfMode,
 };

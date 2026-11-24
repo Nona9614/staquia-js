@@ -30,3 +30,22 @@ import ICrafter from "./crafter.js";
  * }
  */
 export default interface IStaquiaOptions extends Partial<ICrafter> {}
+
+/**
+ * The options of a preset (`Staquia.alphabet()`, `Staquia.urlSafe()`...): the preset sets the characters, these
+ * change the lengths and the threshold, and the classes of `IStaquiaOptions`.
+ *
+ * @example
+ * import Staquia from "staquia";
+ *
+ * // The URL safe characters with a longer `N` section
+ * const system = Staquia.urlSafe({ ln: 6 });
+ */
+export interface IPresetOptions extends IStaquiaOptions {
+  /** The fixed length of the `N` section (`5` by default). */
+  ln?: number;
+  /** The max length of the `Z` section (`15` by default). */
+  lz?: number;
+  /** The threshold factor from `0` to `1` (`0.15` by default). */
+  fϰ?: number;
+}

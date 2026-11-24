@@ -26,7 +26,12 @@ export default function forge(
   // Validated before creating anything, so an invalid string does not allocate any number.
   const first = this.firstUnicodeNumber;
   const last = this.lastUnicodeNumber;
+  const set = this.set;
   for (let i = 0; i < length; i++) {
+    if (set !== undefined) {
+      if (!set.includes(string[i]!)) return new Err(InvalidCharacterError.create(this, string, i));
+      continue;
+    }
     if (string[i] === this.zero) continue;
     const code = string.charCodeAt(i);
     if (code < first || code > last) return new Err(InvalidCharacterError.create(this, string, i));

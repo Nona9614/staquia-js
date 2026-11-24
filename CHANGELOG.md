@@ -10,6 +10,8 @@ Select a Staquia version below to view the changelog history:
 
 ## Unreleased
 
+- **Presets:** `Staquia.alphabet()` (`!` + `a`-`z`, base 27, readable), `Staquia.ascii()` (printable ASCII without `'`, `\` and `` ` ``, base 90, nothing to escape), `Staquia.urlSafe()` (the URL safe base64 characters in code order, base 64) and `Staquia.base36()` (`0`-`9` + `a`-`z`, for case insensitive collations). Every preset, `Staquia.default()` included, takes optional `IPresetOptions` to change the lengths: `Staquia.urlSafe({ ln: 6 })`.
+- **Character sets:** `Staquia.fromCharacters("0bcd...", ln, lz, fϰ)` creates a system from any set of characters sorted by their code, not only a range. A set whose digits are consecutive is the same system as that range, and its positions are compatible.
 - **Fix:** the `ThresholdReachedError` message said "thereshold" and "character's length", and measured the length with the zeroes that complete the position. It now reads "reached the threshold" and uses `position.length`, like the checks.
 
 ## V0.5.1

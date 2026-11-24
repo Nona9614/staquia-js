@@ -51,9 +51,11 @@ export default class InvalidCharacterError extends Error {
    * @param index The index of the first invalid character.
    */
   static create(system: INumberSystem, string: string, index: number) {
-    const message =
-      `The character '${string[index]}' at index ${index} of "${string}" is not a digit of the system ` +
-      `(the zero '${system.zero}' or a character from '${system.first}' to '${system.last}').`;
+    const digits =
+      system.set !== undefined
+        ? `one of the characters "${system.set}"`
+        : `the zero '${system.zero}' or a character from '${system.first}' to '${system.last}'`;
+    const message = `The character '${string[index]}' at index ${index} of "${string}" is not a digit of the system (${digits}).`;
     return new InvalidCharacterError(message, string, index);
   }
 }

@@ -8,7 +8,7 @@ import ICrafter from "../interfaces/crafter.js";
 import IDigits from "../interfaces/digits.js";
 import IPosition from "../interfaces/position.js";
 import IForger from "../interfaces/forger.js";
-import IStaquiaOptions from "../interfaces/options.js";
+import IStaquiaOptions, { IPresetOptions } from "../interfaces/options.js";
 import IOverflowVerifier from "../interfaces/overflow-verifier.js";
 // Implementations
 import Digits from "./digits.js";
@@ -16,6 +16,13 @@ import Position from "./position.js";
 // Errors
 import OverflowError from "../errors/overflow-error.js";
 import { IPositionError } from "../errors/position-error.js";
+
+/** The characters of `Staquia.ascii()`: `!` as the zero and printable ASCII from `#` to `~` without `'`, `\` and `` ` ``. */
+const ASCII = "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~";
+/** The characters of `Staquia.urlSafe()`: the URL safe base64 characters sorted by their code, `-` as the zero. */
+const URL_SAFE = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+/** The characters of `Staquia.base36()`: `0` as the zero, the digits and the lowercase letters. */
+const BASE36 = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 /**
  * The key of the internal room check used by `LexicalList` to sort all or nothing. It is not exported by the
@@ -70,8 +77,105 @@ export default class Staquia implements IForger, IOverflowVerifier {
    * Try other settings for your project in the Setup App of the
    * [documentation](https://nona9614.github.io/staquia-js/#setup).
    */
-  static default() {
-    return Staquia.create("!", "\u00B0", "\u04B1", 5, 15, 0.15);
+  static default(options?: IPresetOptions) {
+    return Staquia.create("!", "\u00B0", "\u04B1", options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
+  }
+
+  /**
+   * The alphabet: `!` as the zero and the lowercase letters from `a` to `z` (base `27`). Readable positions, safe
+   * in URLs, the system of every example of the documentation.
+   *
+   * @param options Changes the lengths, the threshold or the classes, see `IPresetOptions`.
+   *
+   * @example
+   * import Staquia from "staquia";
+   *
+   * const start = Staquia.alphabet().start();
+   * if (start.ok) console.log(start.value.toString()); // "mmmmm!"
+   */
+  static alphabet(options?: IPresetOptions) {
+    return Staquia.create("!", "a", "z", options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
+  }
+
+  /**
+   * Plain ASCII: `!` as the zero and every printable character from `#` to `~` except `'`, `\` and `` ` `` (base
+   * `90`). The most compact choice per byte, and nothing to escape in JSON, SQL literals or logs.
+   *
+   * @param options Changes the lengths, the threshold or the classes, see `IPresetOptions`.
+   *
+   * @example
+   * import Staquia from "staquia";
+   *
+   * const start = Staquia.ascii().start();
+   * if (start.ok) console.log(start.value.toString()); // "PPPPP!"
+   */
+  static ascii(options?: IPresetOptions) {
+    return Staquia.fromCharacters(ASCII, options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
+  }
+
+  /**
+   * URL safe: the characters of URL safe base64 (`-`, `0`-`9`, `A`-`Z`, `_`, `a`-`z`) sorted by their code, `-` as
+   * the zero (base `64`). Positions go in URLs, file names and HTML ids without any encoding.
+   *
+   * The characters are not in the base64 order: positions are sort keys, not encoded data, so they keep the order
+   * a database compares them in.
+   *
+   * @param options Changes the lengths, the threshold or the classes, see `IPresetOptions`.
+   *
+   * @example
+   * import Staquia from "staquia";
+   *
+   * const start = Staquia.urlSafe().start();
+   * if (start.ok) console.log(start.value.toString()); // "VVVVV-"
+   */
+  static urlSafe(options?: IPresetOptions) {
+    return Staquia.fromCharacters(URL_SAFE, options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
+  }
+
+  /**
+   * Base 36: `0` as the zero, the digits `1`-`9` and the lowercase letters (base `36`). Safe with case insensitive
+   * collations (the MySQL default) and where keys must be alphanumeric.
+   *
+   * @param options Changes the lengths, the threshold or the classes, see `IPresetOptions`.
+   *
+   * @example
+   * import Staquia from "staquia";
+   *
+   * const start = Staquia.base36().start();
+   * if (start.ok) console.log(start.value.toString()); // "iiiii0"
+   */
+  static base36(options?: IPresetOptions) {
+    return Staquia.fromCharacters(BASE36, options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
+  }
+
+  /**
+   * Creates a number system from a set of characters: the zero followed by every digit, sorted by their code, so
+   * its base is the number of characters. Use it when the digits are not a range, for example to leave some
+   * characters out; a set whose digits are consecutive is the same system as `create` with that range, and their
+   * positions are compatible.
+   *
+   * The characters must be sorted by their code without repeating any, and be in the Basic Multilingual Plane (up
+   * to `U+FFFF`), so JavaScript, UTF-8 and UTF-16 compare them in the same order.
+   *
+   * @param characters The zero followed by every digit, sorted by their code.
+   * @param ln The fixed length of the `N` section.
+   * @param lz The max length of the `Z` section.
+   * @param fϰ A factor from `0` to `1`: the threshold is reached at the length `lϰ = ceil((1 - fϰ) * (ln + lz))`.
+   * @param options Replaces the classes used to create positions and numbers, see `IStaquiaOptions`.
+   *
+   * @example
+   * import Staquia from "staquia";
+   *
+   * // The digits without the vowels: "0" is the zero
+   * const system = Staquia.fromCharacters("0bcdfghjklmnpqrstvwxyz", 5, 15, 0.15);
+   * const start = system.start();
+   * if (start.ok) console.log(start.value.toString()); // "nnnnn0"
+   */
+  static fromCharacters(characters: string, ln: number, lz: number, fϰ: number, options?: IStaquiaOptions) {
+    const staquia = new Staquia();
+    const crafter: ICrafter = { number: options?.number ?? Digits, position: options?.position ?? Position };
+    staquia.#system = NumberSystem.create(crafter, "", "", "", ln, lz, fϰ, characters);
+    return staquia;
   }
 
   /**

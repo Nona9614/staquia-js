@@ -485,4 +485,100 @@ export default class StaquiaTests extends Spec {
     assert.ok(!reached.ok && reached.error instanceof ThresholdReachedError, "The start position reaches the threshold.");
     assert.equal(half.isThresholdReached(reached.error.position), true);
   }
+
+  // ---------------------------------------------------------------------------
+  // Presets and character sets
+  // ---------------------------------------------------------------------------
+
+  @test("Should create the positions of every preset.", "presets")
+  staquia_presets_start() {
+    const starts = [Staquia.default(), Staquia.alphabet(), Staquia.ascii(), Staquia.urlSafe(), Staquia.base36()].map((system) => {
+      const start = system.start();
+      return start.ok ? start.value.toString() : "error";
+    });
+    assert.deepEqual(starts, ["ʰʰʰʰʰ!", "mmmmm!", "PPPPP!", "VVVVV-", "iiiii0"]);
+  }
+
+  @test("Should keep the string order equal to the position order for every preset.", "presets")
+  staquia_presets_string_order() {
+    for (const [name, system] of [
+      ["default", Staquia.default()],
+      ["alphabet", Staquia.alphabet()],
+      ["ascii", Staquia.ascii()],
+      ["urlSafe", Staquia.urlSafe()],
+      ["base36", Staquia.base36()],
+    ] as const) {
+      let seed = 0x9e3779b9;
+      const random = (limit: number) => {
+        seed ^= seed << 13;
+        seed ^= seed >>> 17;
+        seed ^= seed << 5;
+        return (seed >>> 0) % limit;
+      };
+      const start = system.start();
+      assert.ok(start.ok, `${name}: start`);
+      const positions: IPosition[] = [start.value];
+      const take = (result: IPositionResult) => (result.ok ? result.value : result.error instanceof ThresholdReachedError ? result.error.position : undefined);
+      for (let i = 0; i < 2000; i++) {
+        const index = random(positions.length);
+        const kind = random(3);
+        const created =
+          kind === 0
+            ? take(system.next(positions[positions.length - 1]!))
+            : kind === 1
+              ? take(system.previous(positions[0]!))
+              : index + 1 < positions.length
+                ? take(system.core(positions[index]!, positions[index + 1]!))
+                : take(system.next(positions[positions.length - 1]!));
+        if (!created) continue;
+        let at = 0;
+        while (at < positions.length && positions[at]!.less(created)) at++;
+        if (at === positions.length || !positions[at]!.equal(created)) positions.splice(at, 0, created);
+      }
+      const strings = positions.map((position) => position.toString());
+      const sorted = [...strings].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+      assert.deepEqual(strings, sorted, `${name}: the strings must sort like the positions`);
+      for (const string of strings) {
+        const forged = take(system.forge(string));
+        assert.equal(forged?.toString(), string, `${name}: ${string} is read back`);
+      }
+    }
+  }
+
+  @test("Should treat a set with consecutive digits as the range.", "presets")
+  staquia_presets_consecutive_set() {
+    const set = Staquia.fromCharacters("!abcdefghijklmnopqrstuvwxyz", 5, 15, 0.15);
+    const start = Staquia.alphabet().start();
+    assert.ok(start.ok);
+    const next = set.next(start.value);
+    assert.ok(next.ok, "The positions of the range are compatible");
+    assert.equal(next.value.toString(), "mmmmn!");
+  }
+
+  @test("Should not mix the positions of different sets.", "presets")
+  staquia_presets_mismatch() {
+    const start = Staquia.urlSafe().start();
+    assert.ok(start.ok);
+    const result = Staquia.base36().next(start.value);
+    assert.ok(!result.ok && result.error instanceof SystemMismatchError);
+    const longer = Staquia.urlSafe({ ln: 6 });
+    const other = longer.next(start.value);
+    assert.ok(!other.ok && other.error instanceof SystemMismatchError, "Another N length is another system");
+    const longerStart = longer.start();
+    assert.equal(longerStart.ok && longerStart.value.toString(), "VVVVVV-");
+  }
+
+  @test("Should reject the characters outside a set.", "presets")
+  staquia_presets_invalid_characters() {
+    const system = Staquia.urlSafe();
+    for (const [string, index] of [
+      ["VV.V", 2],
+      ["V/", 1],
+    ] as const) {
+      const result = system.forge(string);
+      assert.ok(!result.ok && result.error instanceof InvalidCharacterError, string);
+      assert.equal(result.error.index, index);
+      assert.ok(result.error.message.includes("one of the characters"), result.error.message);
+    }
+  }
 }

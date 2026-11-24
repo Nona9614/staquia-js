@@ -2,6 +2,8 @@ import INumberSystem from "../../interfaces/number-system.js";
 import IUnicodes from "../../interfaces/unicodes.js";
 
 export default function getMiddle(this: INumberSystem & IUnicodes): string {
+  // The middle digit of `1..base - 1`, the same digit the range formula gives
+  if (this.set !== undefined) return this.set[Math.ceil((this.base - 1) / 2)]!;
   let lastCode = this.lastUnicodeNumber;
   let firstCode = this.firstUnicodeNumber;
   let a_plus_b = lastCode + firstCode - 1;
