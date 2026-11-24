@@ -1145,6 +1145,106 @@ export default class LexicalListTests extends Spec {
     [4, 2, 3, 1].forEach((id, index) => assert.equal(sut.find(id)?.position.toString(), this.#position(index)));
   }
 
+  @test("Should not change the list nor the objects when the system has no room to sort.", "sort")
+  lexical_list_sort_without_room() {
+    // N has one digit from "a" to "c": sorting has room for "b!" and "c!" only
+    const sut = new LexicalList<number, Item>(Staquia.create("!", "a", "c", 1, 3, 0));
+    const objects = [
+      { id: 1, position: "a!" },
+      { id: 2, position: "b!" },
+      { id: 3, position: "c!" },
+    ];
+    assert_ok(sut.set(objects));
+
+    assert_lexical_error(
+      sut.sort((a, b) => b.id - a.id),
+      "position",
+    );
+    assert_links(sut, [1, 2, 3]);
+    assert.deepEqual(
+      objects.map((object) => object.position),
+      ["a!", "b!", "c!"],
+    );
+  }
+
+  @test("Should sort exactly as many items as the system has room for.", "sort")
+  lexical_list_sort_up_to_the_room() {
+    for (const [first, last, ln] of [["a", "c", 1], ["a", "c", 2], ["a", "d", 2], ["a", "b", 3]] as const) {
+      const system = Staquia.create("!", first, last, ln, 3, 0);
+      // The room: the positions stacked one by one from the start
+      let room = 1;
+      let position = assert_ok(system.start());
+      for (let next = system.next(position); next.ok; next = system.next(position)) {
+        position = next.value;
+        room++;
+      }
+      const create = (count: number) => {
+        const sut = new LexicalList<number, Item>(system);
+        for (let id = 1; id <= count; id++) assert_ok(sut.push({ id, position: "" }));
+        return sut;
+      };
+      const fits = create(room);
+      assert_ok(fits.sort((a, b) => b.id - a.id));
+      assert.equal(fits.first()?.id, room, `${room} items from ${first} to ${last} with ln ${ln}.`);
+
+      // One more item fits with `push` (which also stacks before the start) but not in a sort
+      const unshifted = create(room);
+      assert_ok(unshifted.unshift({ id: room + 1, position: "" }));
+      const before = assert_ok(unshifted.toArray()).map((item) => item.position.toString());
+      assert_lexical_error(
+        unshifted.sort((a, b) => b.id - a.id),
+        "position",
+      );
+      assert.deepEqual(
+        assert_ok(unshifted.toArray()).map((item) => item.position.toString()),
+        before,
+        `${room + 1} items from ${first} to ${last} with ln ${ln}.`,
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Rebalance
+  // ---------------------------------------------------------------------------
+
+  @test("Should rebalance keeping the order and report only the changed positions.", "rebalance")
+  lexical_list_rebalance() {
+    const sut = this.#create(1, 2, 3);
+    assert_ok(sut.move(3, 1, 2));
+    assert_links(sut, [1, 3, 2]);
+
+    const [affected, list] = assert_ok(sut.rebalance());
+    assert.deepEqual(
+      list.map((i) => i.id),
+      [1, 3, 2],
+    );
+    // The first item keeps the start position so it must not be reported.
+    assert.deepEqual(
+      affected.map((i) => i.id),
+      [3, 2],
+    );
+    assert_links(sut, [1, 3, 2]);
+    [1, 3, 2].forEach((id, index) => assert.equal(sut.find(id)?.position.toString(), this.#position(index)));
+  }
+
+  @test("Should not change the list nor the objects when the system has no room to rebalance.", "rebalance")
+  lexical_list_rebalance_without_room() {
+    const sut = new LexicalList<number, Item>(Staquia.create("!", "a", "c", 1, 3, 0));
+    const objects = [
+      { id: 1, position: "a!" },
+      { id: 2, position: "b!" },
+      { id: 3, position: "c!" },
+    ];
+    assert_ok(sut.set(objects));
+
+    assert_lexical_error(sut.rebalance(), "position");
+    assert_links(sut, [1, 2, 3]);
+    assert.deepEqual(
+      objects.map((object) => object.position),
+      ["a!", "b!", "c!"],
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Destroy
   // ---------------------------------------------------------------------------

@@ -462,4 +462,27 @@ export default class StaquiaTests extends Spec {
     assert.equal(this.#system.hasOverflow(result.error.position), false);
     assert.equal(this.#system.isThresholdReached(result.error.position), true);
   }
+
+  @test("Should measure the length like the functions that create the positions.", "sync checks")
+  staquia_sync_checks_measure_like_creation() {
+    // lmax = 6 and lϰ = 6: "mmmmm!" is created as 5 digits, the zero that completes it doesn't count
+    const tight = Staquia.create("!", "a", "z", 5, 1, 0);
+    const start = tight.start();
+    assert.ok(start.ok, "The start position is created without a threshold error.");
+    assert.equal(start.value.toString(), "mmmmm!");
+    assert.equal(tight.isThresholdReached(start.value), false);
+    assert.equal(tight.hasOverflow(start.value), false);
+
+    // lϰ = 3: "ab" has 2 characters, below the threshold
+    const half = Staquia.create("!", "a", "z", 5, 1, 0.5);
+    const short = half.forge("ab");
+    assert.ok(short.ok, "The short string is forged without a threshold error.");
+    assert.equal(short.value.toString(), "ab!!!!");
+    assert.equal(half.isThresholdReached(short.value), false);
+
+    // The start position (5 digits) reaches it, and the check agrees with the error
+    const reached = half.start();
+    assert.ok(!reached.ok && reached.error instanceof ThresholdReachedError, "The start position reaches the threshold.");
+    assert.equal(half.isThresholdReached(reached.error.position), true);
+  }
 }

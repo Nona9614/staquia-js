@@ -1,5 +1,5 @@
 // Entities
-import Staquia from "../entities/staquia.js";
+import Staquia, { stackRoom } from "../entities/staquia.js";
 // Errors
 import LexicalError from "../errors/lexical-error.js";
 // Results
@@ -598,8 +598,12 @@ export default class LexicalList<K, T extends Item<K>> {
    * Sorts the items with a compare function and spaces every position again from the start position,
    * going `next` one by one.
    *
-   * Use it to sort by any criteria, or to rebalance the positions keeping the current order after a
-   * `"position"` error (the threshold or the overflow was reached).
+   * Use it to sort by any criteria. To space the positions again keeping the current order (after a
+   * `"position"` error, when the threshold or the overflow was reached) use `rebalance`.
+   *
+   * It is all or nothing: the room for every position is verified before anything changes, so when the
+   * system has no room for every item the error is returned and neither the list nor your objects are
+   * changed.
    *
    * @param compareFn Compares two items, like `Array.prototype.sort`: negative if `a` goes first.
    *
@@ -609,8 +613,8 @@ export default class LexicalList<K, T extends Item<K>> {
    * const list = new LexicalList(Staquia.create("!", "a", "z", 5, 15, 0.15));
    * list.set([{ id: 1, position: "aaaaa" }, { id: 2, position: "bbbbb" }]);
    *
-   * // Rebalances keeping the current order
-   * const sorted = list.sort((a, b) => (a.position.less(b.position) ? -1 : 1));
+   * // Highest id first
+   * const sorted = list.sort((a, b) => b.id - a.id);
    * if (sorted.ok) {
    *   const [affected] = sorted.value;
    *   console.log(affected.map((item) => item.position.toString())); // ["mmmmm!", "mmmmn!"], save these
@@ -631,9 +635,11 @@ export default class LexicalList<K, T extends Item<K>> {
     if (list.length === 0) return new Ok([affected, list]);
     list.sort(compareFn);
 
-    // Reset pointers and assign the initial position
+    // All or nothing: verifies the room for every position before changing any item
     const _start = this.#system.start();
     if (!_start.ok) return new Err(LexicalError.from(_start.error));
+    const room = this.#system[stackRoom](list.length);
+    if (room) return new Err(LexicalError.from(room));
     let currentPosition = _start.value;
 
     const first = list[0]!;
@@ -653,6 +659,7 @@ export default class LexicalList<K, T extends Item<K>> {
       const item = list[i]!;
       if (!item) continue;
 
+      // Can't fail: the room check verified that every `next` fits
       const next = this.#system.next(currentPosition);
       if (!next.ok) return new Err(LexicalError.from(next.error));
       currentPosition = next.value;
@@ -675,6 +682,33 @@ export default class LexicalList<K, T extends Item<K>> {
 
     // Returns the sorted list
     return new Ok([affected, list]);
+  }
+  /**
+   * Spaces every position again from the start position, keeping the current order: the positions
+   * become as short as possible with the most room between them. Use it after a `"position"` error (the
+   * threshold or the overflow was reached), then try the operation again.
+   *
+   * Like `sort`, it is all or nothing: when the system has no room for every item the error is returned
+   * and nothing changes.
+   *
+   * @example
+   * import Staquia, { LexicalList } from "staquia";
+   *
+   * const list = new LexicalList(Staquia.create("!", "a", "z", 5, 15, 0.15));
+   * list.set([{ id: 1, position: "aaaaa" }, { id: 2, position: "bbbbb" }]);
+   *
+   * const rebalanced = list.rebalance();
+   * if (rebalanced.ok) {
+   *   const [affected] = rebalanced.value;
+   *   console.log(affected.map((item) => item.position.toString())); // ["mmmmm!", "mmmmn!"], save these
+   * }
+   *
+   * @returns The items whose position changed (only these need to be saved) and every item in order, or a
+   * `"position"` error if the system has no room for all of them.
+   */
+  rebalance(): Result<[LexicalItem<K, T>[], LexicalItem<K, T>[]], LexicalError> {
+    // `Array.prototype.sort` is stable, so equal items keep the current order
+    return this.sort(() => 0);
   }
   /**
    * Gets the item at an index of the list order, walking from the first item.

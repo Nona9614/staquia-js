@@ -13,6 +13,17 @@ import IOverflowVerifier from "../interfaces/overflow-verifier.js";
 // Implementations
 import Digits from "./digits.js";
 import Position from "./position.js";
+// Errors
+import OverflowError from "../errors/overflow-error.js";
+import { IPositionError } from "../errors/position-error.js";
+
+/**
+ * The key of the internal room check used by `LexicalList` to sort all or nothing. It is not exported by the
+ * package, so it is not part of the public API.
+ *
+ * @hidden
+ */
+export const stackRoom = Symbol("staquia.stackRoom");
 
 /**
  * A lexicographic number system that creates **positions**: short strings that keep the order of a list.
@@ -128,12 +139,35 @@ export default class Staquia implements IForger, IOverflowVerifier {
 
   /** {@inheritDoc IOverflowVerifier.hasOverflow} */
   hasOverflow(position: IPosition): boolean {
-    const length = position.n.upperBound + position.z.upperBound + 2;
-    return length > this.#system.lmax;
+    // The length measured when the position was created, like the `OverflowError`
+    return position.length > this.#system.lmax;
   }
   /** {@inheritDoc IOverflowVerifier.isThresholdReached} */
   isThresholdReached(position: IPosition): boolean {
-    const length = position.n.upperBound + position.z.upperBound + 2;
-    return length >= this.#system.lϰ;
+    // The length measured when the position was created, like the `ThresholdReachedError`
+    return position.length >= this.#system.lϰ;
+  }
+  /**
+   * Verifies that `count` positions can be stacked from `start` with `next`, without creating them: the last
+   * one is `start + (count - 1)` in `N`, one addition of `ln` digits.
+   *
+   * @returns The error the last `next` would return when there is no room, otherwise `undefined`.
+   * @hidden
+   */
+  [stackRoom](count: number): IPositionError | undefined {
+    const system = this.#system;
+    const base = system.base;
+    const middle = system.getCode(system.getMiddle());
+    let remaining = Math.max(count - 1, 0);
+    let carry = 0;
+    for (let i = 0; i < system.ln; i++) {
+      const digit = middle + (remaining % base) + carry;
+      carry = digit >= base ? 1 : 0;
+      remaining = Math.floor(remaining / base);
+    }
+    if (carry === 0 && remaining === 0) return undefined;
+    // `next` stops at the last value of `N`: every digit is `last`
+    const edge = system.forge(system.last.repeat(system.ln));
+    return edge.ok ? OverflowError.limit(edge.value, "next") : edge.error;
   }
 }

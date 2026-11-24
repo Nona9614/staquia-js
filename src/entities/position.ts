@@ -26,7 +26,11 @@ export default class Position implements IPosition {
   n!: IDigits;
   /** The digits of the `Z` section. */
   z!: IDigits;
-  /** The length of the position string (`N` plus `Z`). */
+  /**
+   * The length measured when the position was created (`N` plus `Z`), the one the threshold and the max
+   * length are compared with. It doesn't count the zeroes that complete the string: `"mmmmm!"` created by
+   * `start` has `5`, `"ab!!!!"` forged from `"ab"` has `2`.
+   */
   length!: number;
 
   digits(): IDigits {

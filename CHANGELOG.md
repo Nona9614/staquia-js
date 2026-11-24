@@ -3,12 +3,18 @@
 Select a Staquia version below to view the changelog history:
 
 - [Unreleased](#Unreleased)
-- [Staquia 0.5.0](#V0.5.0) **Current**
+- [Staquia 0.5.1](#V0.5.1) **Current**
+- [Staquia 0.5.0](#V0.5.0)
 - [Staquia 0.4.0](#V0.4.0) **Unstable, do not use**
 - [Staquia 0.3.4](#V0.3.4)
 
 ## Unreleased
 
+## V0.5.1
+
+- **Fix:** `LexicalList.sort` changed the positions and the links one item at a time, so when the system ran out of room in the middle (a `"position"` error) the list was left half sorted with broken links (even `toArray` failed) and some of your objects already had new positions. Now the room for every position is verified first, with one addition of `ln` digits and no copy of the positions, and when there is none nothing is changed.
+- Added `LexicalList.rebalance()`: spaces every position again keeping the current order, the same as `sort((a, b) => (a.position.less(b.position) ? -1 : 1))`. All or nothing like `sort`.
+- **Fix:** `hasOverflow` and `isThresholdReached` measured the length of a position with the zeroes that complete it, while the functions that create positions don't count them. With a threshold close to `ln` they disagreed: `start()` returned `"mmmmm!"` without a `ThresholdReachedError` but `isThresholdReached` reported it. Now both use `position.length`, the length measured when the position was created.
 - Added the `module` field to the `package.json` (pointing to the same `index.js`), so tools that don't read `exports` (like Bundlephobia) recognize the package as an ES module. Nothing changes for Node or modern bundlers.
 - The README states the test port (`5681`).
 

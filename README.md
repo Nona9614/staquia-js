@@ -93,7 +93,7 @@ Repeated reinsertions in the same gap make `Z` longer. To avoid running out of r
 | **Threshold reached** | The position length reaches `lϰ`, calculated from the factor `fϰ`                    | The positions in that area are getting long, it is time to space them again.                  |
 | **Overflow**          | The position length is bigger than `ln + lz`, or `N` has no `next`/`previous` value  | There is no valid position, the positions must be spaced again before inserting.              |
 
-Spacing the positions again is done sorting the list (see [`sort`](#sorting-and-rebalancing)).
+Spacing the positions again is done rebalancing the list (see [`rebalance`](#sorting-and-rebalancing)).
 
 ## Creating a system
 
@@ -340,18 +340,20 @@ In both modes `null`, `undefined` or repeated ids fail with an error, and when a
 
 ### Sorting and rebalancing
 
-`sort` orders the items with a compare function and spaces every position again from the start. It returns the affected items (the ones whose position changed) and the sorted items.
+`sort` orders the items with a compare function and spaces every position again from the start. `rebalance` does the same keeping the current order, useful after a threshold or overflow error. Both return the affected items (the ones whose position changed) and the items in their new order.
 
 ```js
 // Sorts by any criteria of the items (id, position, previous or next)
 list.sort((a, b) => a.id - b.id);
 
-// Rebalances keeping the current order, useful after a threshold or overflow error
-const result = list.sort((a, b) => (a.position.less(b.position) ? -1 : 1));
+// Spaces the positions again keeping the current order
+const result = list.rebalance();
 if (result.ok) {
   const [affected] = result.value; // Save these rows
 }
 ```
+
+Both are all or nothing: the room for every position is verified before anything changes, so when the system has no room for every item a `"position"` error is returned and neither the list nor your objects are changed.
 
 ### List errors
 
