@@ -49,10 +49,11 @@ export default class ThresholdReachedError extends Error {
    */
   static create(system: INumberSystem, position: IPosition) {
     const string = position.toString();
-    const length = position.n.upperBound + position.z.upperBound + 2;
+    // The length measured when the position was created, the one compared with the threshold
+    const length = position.length;
     const lϰ = system.lϰ;
     const diff = system.lmax - lϰ;
-    const message = `The position "${string}" with '${length}' reached the thereshold '${lϰ}'.\nThe system is about '${diff}' character's length before it causes an overflow.`;
+    const message = `The position "${string}" with '${length}' reached the threshold '${lϰ}'.\nThe system is about '${diff}' characters away from causing an overflow.`;
     return new ThresholdReachedError(message, position);
   }
 }

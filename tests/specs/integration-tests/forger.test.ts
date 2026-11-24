@@ -237,7 +237,7 @@ export default class ForgerTest extends Spec {
     // Assert
     const position = assert_error(
       result,
-      `The position "${string}" with '${string.length}' reached the thereshold '${this.system.lϰ}'.\nThe system is about '${diff}' character's length before it causes an overflow.`,
+      `The position "${string}" with '${string.length}' reached the threshold '${this.system.lϰ}'.\nThe system is about '${diff}' characters away from causing an overflow.`,
       ThresholdReachedError,
     );
     const n = position.n as AlphabeticalDigits;

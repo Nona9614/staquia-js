@@ -2,10 +2,15 @@
 
 Select a Staquia version below to view the changelog history:
 
+- [Unreleased](#Unreleased)
 - [Staquia 0.5.1](#V0.5.1) **Current**
 - [Staquia 0.5.0](#V0.5.0)
 - [Staquia 0.4.0](#V0.4.0) **Unstable, do not use**
 - [Staquia 0.3.4](#V0.3.4)
+
+## Unreleased
+
+- **Fix:** the `ThresholdReachedError` message said "thereshold" and "character's length", and measured the length with the zeroes that complete the position. It now reads "reached the threshold" and uses `position.length`, like the checks.
 
 ## V0.5.1
 
