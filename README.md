@@ -9,7 +9,7 @@ To have a full detailed explanation you can go to the [documentation site](https
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [How positions work](#how-positions-work)
-- [Creating a system](#creating-a-system)
+- [Creating a system](#creating-a-system) (and [presets](#presets))
 - [Positions](#positions)
 - [Results and errors](#results-and-errors)
 - [Lexical list](#lexical-list)
@@ -51,8 +51,8 @@ const { default: Staquia, LexicalList } = require("staquia");
 ```js
 import Staquia, { LexicalList } from "staquia";
 
-// The number system that generates the positions (see "Creating a system")
-const system = Staquia.create("!", "a", "z", 5, 15, 0.15);
+// The number system that generates the positions (see "Presets")
+const system = Staquia.alphabet();
 
 // Any object with an `id` and a `position` field can be stored
 const list = new LexicalList(system);
@@ -118,6 +118,27 @@ The digits are every character from `first` to `last` (in unicode order) plus th
 - `zero` must be smaller than `first`, and `first` smaller than `last`, by their unicode value.
 - Use characters from the [Basic Multilingual Plane](https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane) (up to `U+FFFF`), so JavaScript, UTF-8 and UTF-16 compare them in the same order.
 
+### Presets
+
+Ready to use systems, no parameters to choose. Each one takes optional lengths: `Staquia.urlSafe({ ln: 6 })`.
+
+| Preset | Characters | Base | Start | Pick it when |
+| ------ | ---------- | ---- | ----- | ------------ |
+| `Staquia.ascii()` | `!` + printable ASCII from `#` to `~` without `'`, `\` and `` ` `` | 90 | `PPPPP!` | you want plain ASCII: the most compact per byte, nothing to escape in JSON, SQL or logs |
+| `Staquia.urlSafe()` | `-`, `0`-`9`, `A`-`Z`, `_`, `a`-`z` | 64 | `VVVVV-` | positions go in URLs, file names or HTML ids |
+| `Staquia.base36()` | `0`-`9`, `a`-`z` | 36 | `iiiii0` | the column is case insensitive (MySQL's default) or keys must be alphanumeric |
+| `Staquia.alphabet()` | `!` + `a`-`z` | 27 | `mmmmm!` | you want to read them in logs and docs (every example here uses it) |
+| `Staquia.default()` | `!` + `°` to `ұ` | 1027 | `ʰʰʰʰʰ!` | the shortest in characters (PostgreSQL `varchar(n)` counts characters) |
+
+The characters of `urlSafe` are the ones of URL safe base64, but sorted by their code instead of the base64 order: positions are sort keys, not encoded data, so they keep the order a database compares them in.
+
+Any other set of characters works too, not only a range: `Staquia.fromCharacters(characters, ln, lz, fϰ)` takes the zero followed by every digit, sorted by their code.
+
+```js
+// The digits without the vowels: "0" is the zero, base 22
+const system = Staquia.fromCharacters("0bcdfghjklmnpqrstvwxyz", 5, 15, 0.15);
+```
+
 ### Using several systems
 
 An application can create as many systems as it needs, for example one with ASCII characters for keys used in URLs and the default one for a database, or the old and the new configuration while migrating the positions. Each system prints its positions with its own characters, creating a new system never affects the existing ones.
@@ -125,7 +146,7 @@ An application can create as many systems as it needs, for example one with ASCI
 Positions can only be used by systems with the same configuration (the same `zero`, `first`, `last` and `ln`), as only then their digits have the same meaning. Passing a position from another system to `next`, `previous` or `core` fails with a `SystemMismatchError`:
 
 ```js
-const alphabet = Staquia.create("!", "a", "z", 5, 15, 0.15);
+const alphabet = Staquia.alphabet();
 const digits = Staquia.create("#", "0", "9", 5, 15, 0.15);
 
 alphabet.next(digits.start()); // Fails with a SystemMismatchError
