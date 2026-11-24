@@ -2,13 +2,10 @@
 
 Select a Staquia version below to view the changelog history:
 
-- [Unreleased](#Unreleased)
 - [Staquia 0.5.1](#V0.5.1) **Current**
 - [Staquia 0.5.0](#V0.5.0)
 - [Staquia 0.4.0](#V0.4.0) **Unstable, do not use**
 - [Staquia 0.3.4](#V0.3.4)
-
-## Unreleased
 
 ## V0.5.1
 

@@ -251,6 +251,8 @@ system.isThresholdReached(position); // Its length reached the threshold lϰ
 system.hasOverflow(position); // Its length is bigger than ln + lz
 ```
 
+Both compare `position.length`, the length measured when the position was created, the same one the errors use. It doesn't count the zeroes that complete the string: the start position `"mmmmm!"` has a length of `5`.
+
 ## Lexical list
 
 `LexicalList` is a doubly linked list that keeps the order of your objects and their positions in sync. Each object must have an `id` (never `null` or `undefined`) and a `position` string.
