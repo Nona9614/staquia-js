@@ -15,7 +15,7 @@ import IOrdinal from "./interfaces/ordinal.js";
 import IOverflowVerifier from "./interfaces/overflow-verifier.js";
 import IPosition from "./interfaces/position.js";
 import IUnicodes from "./interfaces/unicodes.js";
-import IStaquiaOptions from "./interfaces/options.js";
+import IStaquiaOptions, { IPresetOptions } from "./interfaces/options.js";
 
 export {
   IAlgorithms,
@@ -34,6 +34,7 @@ export {
   IUnicodes,
   IPositionResult,
   IStaquiaOptions,
+  IPresetOptions,
 };
 
 // Unions
