@@ -41,6 +41,7 @@
   "scripts": {
     "bundle": "tsx ./rollup.config.ts",
     "tests": "tsx watch --env-file .env tests/main.ts",
+    "tests:ci": "tsx tests/run.ts",
     "doc": "typedoc --categorizeByGroup"
   },
   "author": "nona9614",

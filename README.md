@@ -1,5 +1,12 @@
 # Staquia
 
+[![npm](https://img.shields.io/npm/v/staquia.svg)](https://www.npmjs.com/package/staquia)
+[![CI](https://github.com/Nona9614/staquia-js/actions/workflows/ci.yml/badge.svg)](https://github.com/Nona9614/staquia-js/actions/workflows/ci.yml)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/staquia)](https://bundlephobia.com/package/staquia)
+![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)
+![types](https://img.shields.io/badge/types-included-blue.svg)
+[![license](https://img.shields.io/npm/l/staquia.svg)](LICENCE)
+
 Staquia is a configurable, zero dependency, lexicographic **position** algorithm. It solves the reinsertion and sorting problem of long lists: every item stores a short `string` position, and sorting those strings gives the order of the list.
 
 When an item is moved, only **its own** position changes, the surrounding items never need to be updated. This makes it ideal for lists and tables stored in a database, where reordering one row should mean writing one row.
