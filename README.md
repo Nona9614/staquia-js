@@ -11,7 +11,7 @@ Staquia is a configurable, zero dependency, lexicographic **position** algorithm
 
 When an item is moved, only **its own** position changes, the surrounding items never need to be updated. This makes it ideal for lists and tables stored in a database, where reordering one row should mean writing one row.
 
-To have a full detailed explanation you can go to the [documentation site](https://nona9614.github.io/staquia-js/).
+To have a full detailed explanation you can go to the [documentation site](https://nona9614.github.io/staquia-js/#view=get-started&lang=javascript).
 
 - [Installation](#installation)
 - [Quick start](#quick-start)

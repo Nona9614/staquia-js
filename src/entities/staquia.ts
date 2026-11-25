@@ -52,7 +52,7 @@ export const stackRoom = Symbol("staquia.stackRoom");
  * if (core.ok) console.log(core.value.toString()); // "mmmmmn"
  *
  * @remarks
- * Read the guide at the [Staquia](https://nona9614.github.io/staquia-js/) documentation page.
+ * Read the guide at the [Staquia](https://nona9614.github.io/staquia-js/#view=get-started&lang=javascript) documentation page.
  */
 export default class Staquia implements IForger, IOverflowVerifier {
   #system!: IComplexSystem;
@@ -75,7 +75,7 @@ export default class Staquia implements IForger, IOverflowVerifier {
    *
    * @remarks
    * Try other settings for your project in the Setup App of the
-   * [documentation](https://nona9614.github.io/staquia-js/#setup).
+   * [documentation](https://nona9614.github.io/staquia-js/#view=setup&lang=javascript).
    */
   static default(options?: IPresetOptions) {
     return Staquia.create("!", "\u00B0", "\u04B1", options?.ln ?? 5, options?.lz ?? 15, options?.fϰ ?? 0.15, options);
