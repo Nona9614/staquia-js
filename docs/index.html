@@ -2518,8 +2518,28 @@ var e=[`get-started`,`introduction`,`why-staquia`,`comparison`,`strings`,`number
       <a href="https://sortablejs.github.io/Sortable/">SortableJS</a> moves the element in the page and calls <code>onEnd</code>.
       The neighbors of the moved element are its new previous and next items: pass their ids to
       <span data-lang="javascript"><code>list.move</code></span><span data-lang="rust"><code>list.move_to</code></span><span data-lang="javascript"></span><span data-lang="rust"> in your server</span>.
+      <span data-lang="javascript">Each item carries its id in a <code>data-id</code> attribute:</span><span data-lang="rust"></span>
     </p>
   </section>
+  <div data-lang="javascript">
+<section class="code-block">
+  <div class="code-block__display code-block__html">
+    <menu class="code-block__menu">
+      <span class="title">html</span>
+      <div class="filler"></div>
+      
+<button type="button" class="copy-button" data-copy="drag-and-drop-html">
+  <span class="copy-button__note">Copy Code</span>
+  <i>📄</i>
+</button>
+    </menu>
+    <pre id="drag-and-drop-html" class="code-block__text"><code><span class="symbol">&lt;</span><span class="tag">ul</span> <span class="attribute">id</span>=<span class="string">"tasks"</span><span class="symbol">&gt;</span>
+  <span class="symbol">&lt;</span><span class="tag">li</span> <span class="attribute">data-id</span>=<span class="string">"1"</span><span class="symbol">&gt;</span>Milk<span class="symbol">&lt;/</span><span class="tag">li</span><span class="symbol">&gt;</span>
+  <span class="symbol">&lt;</span><span class="tag">li</span> <span class="attribute">data-id</span>=<span class="string">"2"</span><span class="symbol">&gt;</span>Meat<span class="symbol">&lt;/</span><span class="tag">li</span><span class="symbol">&gt;</span>
+  <span class="symbol">&lt;</span><span class="tag">li</span> <span class="attribute">data-id</span>=<span class="string">"3"</span><span class="symbol">&gt;</span>Bread<span class="symbol">&lt;/</span><span class="tag">li</span><span class="symbol">&gt;</span>
+<span class="symbol">&lt;/</span><span class="tag">ul</span><span class="symbol">&gt;</span></code></pre>
+  </div>
+</section></div>
   
 <section class="code-block">
   <div class="code-block__display code-block__javascript" data-lang="javascript">
@@ -2539,13 +2559,30 @@ var e=[`get-started`,`introduction`,`why-staquia`,`comparison`,`strings`,`number
 <span class="keyword">const</span> <span class="constant">list</span> = <span class="keyword">new</span> <span class="type">LexicalList</span><span class="bracket-0">(</span><span class="type">Staquia</span>.<span class="function">ascii</span><span class="bracket-1">(</span><span class="bracket-1">)</span><span class="bracket-0">)</span>;
 <span class="constant">list</span>.<span class="function">set</span><span class="bracket-0">(</span><span class="variable">rows</span><span class="bracket-0">)</span>;
 
-<span class="keyword">const</span> <span class="constant">idOf</span> = <span class="bracket-0">(</span><span class="variable">element</span><span class="bracket-0">)</span> <span class="keyword">=&gt;</span> <span class="bracket-0">(</span><span class="variable">element</span> ? <span class="type">Number</span><span class="bracket-1">(</span><span class="variable">element</span>.<span class="property">dataset</span>.<span class="property">id</span><span class="bracket-1">)</span> : <span class="keyword">undefined</span><span class="bracket-0">)</span>;
+<span class="keyword">const</span> <span class="constant">element</span> = <span class="variable">document</span>.<span class="function">querySelector</span><span class="bracket-0">(</span><span class="string">"#tasks"</span><span class="bracket-0">)</span>;
 
-<span class="type">Sortable</span>.<span class="function">create</span><span class="bracket-0">(</span><span class="variable">document</span>.<span class="function">querySelector</span><span class="bracket-1">(</span><span class="string">"#tasks"</span><span class="bracket-1">)</span>, <span class="bracket-1">{</span>
-  <span class="function">onEnd</span><span class="bracket-2">(</span><span class="bracket-0">{</span> <span class="variable">item</span> <span class="bracket-0">}</span><span class="bracket-2">)</span> <span class="bracket-2">{</span>
-    <span class="keyword">const</span> <span class="constant">id</span> = <span class="function">idOf</span><span class="bracket-0">(</span><span class="variable">item</span><span class="bracket-0">)</span>;
-    <span class="keyword">const</span> <span class="constant">previous</span> = <span class="function">idOf</span><span class="bracket-0">(</span><span class="variable">item</span>.<span class="property">previousElementSibling</span><span class="bracket-0">)</span>;
-    <span class="keyword">const</span> <span class="constant">next</span> = <span class="function">idOf</span><span class="bracket-0">(</span><span class="variable">item</span>.<span class="property">nextElementSibling</span><span class="bracket-0">)</span>;
+<span class="comment">// Puts the elements back in the order of the list, to undo a drop that can't be saved</span>
+<span class="keyword">const</span> <span class="constant">restore</span> = <span class="bracket-0">(</span><span class="bracket-0">)</span> <span class="keyword">=&gt;</span> <span class="bracket-0">{</span>
+  <span class="keyword">const</span> <span class="constant">items</span> = <span class="constant">list</span>.<span class="function">toArray</span><span class="bracket-1">(</span><span class="bracket-1">)</span>;
+  <span class="control">if</span> <span class="bracket-1">(</span>!<span class="constant">items</span>.<span class="property">ok</span><span class="bracket-1">)</span> <span class="control">return</span>;
+  <span class="comment">// append moves each element to the end, so they end in the list order (unknown elements stay first)</span>
+  <span class="control">for</span> <span class="bracket-1">(</span><span class="keyword">const</span> <span class="constant">item</span> <span class="control">of</span> <span class="constant">items</span>.<span class="property">value</span><span class="bracket-1">)</span> <span class="bracket-1">{</span>
+    <span class="keyword">const</span> <span class="constant">child</span> = <span class="constant">element</span>.<span class="function">querySelector</span><span class="bracket-2">(</span><span class="string">`[data-id="${item.id}"]`</span><span class="bracket-2">)</span>;
+    <span class="control">if</span> <span class="bracket-2">(</span><span class="constant">child</span><span class="bracket-2">)</span> <span class="constant">element</span>.<span class="function">append</span><span class="bracket-2">(</span><span class="constant">child</span><span class="bracket-2">)</span>;
+  <span class="bracket-1">}</span>
+<span class="bracket-0">}</span>;
+
+<span class="type">Sortable</span>.<span class="function">create</span><span class="bracket-0">(</span><span class="constant">element</span>, <span class="bracket-1">{</span>
+  <span class="function">onEnd</span><span class="bracket-2">(</span><span class="bracket-0">{</span> <span class="constant">item</span> <span class="bracket-0">}</span><span class="bracket-2">)</span> <span class="bracket-2">{</span>
+    <span class="keyword">const</span> <span class="constant">before</span> = <span class="constant">item</span>.<span class="property">previousElementSibling</span>;
+    <span class="keyword">const</span> <span class="constant">after</span> = <span class="constant">item</span>.<span class="property">nextElementSibling</span>;
+
+    <span class="keyword">const</span> <span class="constant">id</span> = <span class="type">Number</span>.<span class="function">parseInt</span><span class="bracket-0">(</span><span class="constant">item</span>.<span class="property">dataset</span>.<span class="property">id</span><span class="bracket-0">)</span>;
+    <span class="keyword">const</span> <span class="constant">previous</span> = <span class="constant">before</span> ? <span class="type">Number</span>.<span class="function">parseInt</span><span class="bracket-0">(</span><span class="constant">before</span>.<span class="property">dataset</span>.<span class="property">id</span><span class="bracket-0">)</span> : <span class="keyword">undefined</span>; <span class="comment">// undefined at the top</span>
+    <span class="keyword">const</span> <span class="constant">next</span> = <span class="constant">after</span> ? <span class="type">Number</span>.<span class="function">parseInt</span><span class="bracket-0">(</span><span class="constant">after</span>.<span class="property">dataset</span>.<span class="property">id</span><span class="bracket-0">)</span> : <span class="keyword">undefined</span>; <span class="comment">// undefined at the bottom</span>
+
+    <span class="comment">// An element without a valid data-id cancels the move</span>
+    <span class="control">if</span> <span class="bracket-0">(</span><span class="type">Number</span>.<span class="function">isNaN</span><span class="bracket-1">(</span><span class="constant">id</span><span class="bracket-1">)</span> || <span class="type">Number</span>.<span class="function">isNaN</span><span class="bracket-1">(</span><span class="constant">previous</span><span class="bracket-1">)</span> || <span class="type">Number</span>.<span class="function">isNaN</span><span class="bracket-1">(</span><span class="constant">next</span><span class="bracket-1">)</span><span class="bracket-0">)</span> <span class="control">return</span> <span class="function">restore</span><span class="bracket-0">(</span><span class="bracket-0">)</span>;
 
     <span class="keyword">let</span> <span class="variable">moved</span> = <span class="constant">list</span>.<span class="function">move</span><span class="bracket-0">(</span><span class="constant">id</span>, <span class="constant">previous</span>, <span class="constant">next</span><span class="bracket-0">)</span>;
     <span class="control">if</span> <span class="bracket-0">(</span>!<span class="variable">moved</span>.<span class="property">ok</span> &amp;&amp; <span class="variable">moved</span>.<span class="property">error</span>.<span class="property">type</span> === <span class="string">"position"</span><span class="bracket-0">)</span> <span class="bracket-0">{</span>
@@ -2555,6 +2592,7 @@ var e=[`get-started`,`introduction`,`why-staquia`,`comparison`,`strings`,`number
       <span class="variable">moved</span> = <span class="constant">list</span>.<span class="function">move</span><span class="bracket-1">(</span><span class="constant">id</span>, <span class="constant">previous</span>, <span class="constant">next</span><span class="bracket-1">)</span>;
     <span class="bracket-0">}</span>
     <span class="control">if</span> <span class="bracket-0">(</span><span class="variable">moved</span>.<span class="property">ok</span><span class="bracket-0">)</span> <span class="function">save</span><span class="bracket-0">(</span><span class="variable">moved</span>.<span class="property">value</span><span class="bracket-0">)</span>; <span class="comment">// One row: UPDATE tasks SET position = ... WHERE id = ...</span>
+    <span class="control">else</span> <span class="function">restore</span><span class="bracket-0">(</span><span class="bracket-0">)</span>; <span class="comment">// SortableJS already moved it on screen: put it back</span>
   <span class="bracket-2">}</span>,
 <span class="bracket-1">}</span><span class="bracket-0">)</span>;</code></pre>
   </div>
