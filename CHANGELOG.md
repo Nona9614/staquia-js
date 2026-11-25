@@ -2,17 +2,19 @@
 
 Select a Staquia version below to view the changelog history:
 
-- [Unreleased](#Unreleased)
-- [Staquia 0.5.1](#V0.5.1) **Current**
+- [Staquia 0.6.0](#V0.6.0) **Current**
+- [Staquia 0.5.1](#V0.5.1)
 - [Staquia 0.5.0](#V0.5.0)
 - [Staquia 0.4.0](#V0.4.0) **Unstable, do not use**
 - [Staquia 0.3.4](#V0.3.4)
 
-## Unreleased
+## V0.6.0
 
 - **Presets:** `Staquia.alphabet()` (`!` + `a`-`z`, base 27, readable), `Staquia.ascii()` (printable ASCII without `'`, `\` and `` ` ``, base 90, nothing to escape), `Staquia.urlSafe()` (the URL safe base64 characters in code order, base 64) and `Staquia.base36()` (`0`-`9` + `a`-`z`, for case insensitive collations). Every preset, `Staquia.default()` included, takes optional `IPresetOptions` to change the lengths: `Staquia.urlSafe({ ln: 6 })`.
 - **Character sets:** `Staquia.fromCharacters("0bcd...", ln, lz, fϰ)` creates a system from any set of characters sorted by their code, not only a range. A set whose digits are consecutive is the same system as that range, and its positions are compatible.
 - **Fix:** the `ThresholdReachedError` message said "thereshold" and "character's length", and measured the length with the zeroes that complete the position. It now reads "reached the threshold" and uses `position.length`, like the checks.
+- The documentation links of the README and the API reference open the site in JavaScript (`#view=get-started&lang=javascript`): the site keeps the page and the code language in its address.
+- CI on GitHub Actions (types, tests and bundle) with `pnpm run tests:ci`, a terminal runner of every spec; the README has its badge and the npm, size, dependencies, types and license badges.
 
 ## V0.5.1
 
